@@ -8,13 +8,23 @@ from wagtail.documents import urls as wagtaildocs_urls
 
 from search import views as search_views
 
+# --- ИМПОРТЫ ДЛЯ API ---
+from wagtail.api.v2.views import PagesAPIViewSet
+from wagtail.api.v2.router import WagtailAPIRouter
+
+# --- СОЗДАНИЕ РОУТЕРА API ---
+api_router = WagtailAPIRouter('wagtailapi')
+api_router.register_endpoint('pages', PagesAPIViewSet)
+
 urlpatterns = [
     path("django-admin/", admin.site.urls),
     path("admin/", include(wagtailadmin_urls)),
     path("documents/", include(wagtaildocs_urls)),
     path("search/", search_views.search, name="search"),
+    
+    # --- ПУТЬ ДЛЯ API ---
+    path("api/v2/", api_router.urls),
 ]
-
 
 if settings.DEBUG:
     from django.conf.urls.static import static
@@ -29,7 +39,4 @@ urlpatterns = urlpatterns + [
     # Wagtail's page serving mechanism. This should be the last pattern in
     # the list:
     path("", include(wagtail_urls)),
-    # Alternatively, if you want Wagtail pages to be served from a subpath
-    # of your site, rather than the site root:
-    #    path("pages/", include(wagtail_urls)),
 ]
