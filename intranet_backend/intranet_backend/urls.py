@@ -24,6 +24,9 @@ urlpatterns = [
     
     # --- ПУТЬ ДЛЯ API ---
     path("api/v2/", api_router.urls),
+
+    # --- REST API ---
+    path("api/departments/", include("departments.urls")),
 ]
 
 if settings.DEBUG:
