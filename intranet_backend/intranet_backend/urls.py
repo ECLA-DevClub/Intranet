@@ -26,6 +26,7 @@ urlpatterns = [
     path("api/v2/", api_router.urls),
 
     # --- REST API ---
+    path("api/auth/", include("accounts.urls")),
     path("api/departments/", include("departments.urls")),
 ]
 

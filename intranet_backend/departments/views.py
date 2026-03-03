@@ -1,19 +1,21 @@
 from rest_framework import viewsets, filters
+from rest_framework.permissions import IsAuthenticated
 
+from accounts.permissions import IsManagerOrAdmin
 from departments.models import Department
 from departments.serializers import DepartmentSerializer
 
 
 class DepartmentViewSet(viewsets.ModelViewSet):
     """
-    CRUD ViewSet for Department.
+    CRUD ViewSet for Department with role-based permissions.
 
-    list:   GET    /api/departments/
-    create: POST   /api/departments/
-    read:   GET    /api/departments/{id}/
-    update: PUT    /api/departments/{id}/
-    patch:  PATCH  /api/departments/{id}/
-    delete: DELETE /api/departments/{id}/
+    list:   GET    /api/departments/        — any authenticated
+    create: POST   /api/departments/        — Admin / Manager
+    read:   GET    /api/departments/{id}/   — any authenticated
+    update: PUT    /api/departments/{id}/   — Admin / Manager
+    patch:  PATCH  /api/departments/{id}/   — Admin / Manager
+    delete: DELETE /api/departments/{id}/   — Admin / Manager
     """
 
     queryset = Department.objects.all()
@@ -22,3 +24,8 @@ class DepartmentViewSet(viewsets.ModelViewSet):
     search_fields = ["name"]
     ordering_fields = ["name", "created_at"]
     ordering = ["name"]
+
+    def get_permissions(self):
+        if self.action in ("list", "retrieve"):
+            return [IsAuthenticated()]
+        return [IsManagerOrAdmin()]
