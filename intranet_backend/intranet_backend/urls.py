@@ -28,6 +28,7 @@ urlpatterns = [
     # --- REST API ---
     path("api/auth/", include("accounts.urls")),
     path("api/departments/", include("departments.urls")),
+    path("api/", include("employees.urls")),
 ]
 
 if settings.DEBUG:
