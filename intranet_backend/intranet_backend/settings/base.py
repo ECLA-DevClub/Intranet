@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     "accounts",
     "departments",
     "employees",
+    "documents",
     "corsheaders",
     "rest_framework",
     "wagtail.api.v2",

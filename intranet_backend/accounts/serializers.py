@@ -28,7 +28,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ["id", "username", "email", "password", "role"]
+        fields = ["id", "username", "email", "password", "role", "department"]
         read_only_fields = ["id"]
 
     def create(self, validated_data):
@@ -44,5 +44,5 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ["id", "username", "email", "role", "date_joined"]
+        fields = ["id", "username", "email", "role", "department", "date_joined"]
         read_only_fields = ["id", "role", "date_joined"]

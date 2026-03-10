@@ -18,6 +18,15 @@ class User(AbstractUser):
         help_text="User role for access control.",
     )
 
+    department = models.ForeignKey(
+        'departments.Department',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='users',
+        help_text="The department this user belongs to.",
+    )
+
     class Meta:
         verbose_name = "User"
         verbose_name_plural = "Users"
