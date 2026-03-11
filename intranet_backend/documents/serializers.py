@@ -6,7 +6,7 @@ class DocumentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Document
-        fields = ['id', 'title', 'file', 'author', 'author_name', 'allowed_departments', 'created_at', 'updated_at']
+        fields = ['id', 'title', 'file', 'author', 'author_name', 'department', 'created_at', 'updated_at']
         read_only_fields = ['id', 'author', 'created_at', 'updated_at']
 
     def create(self, validated_data):

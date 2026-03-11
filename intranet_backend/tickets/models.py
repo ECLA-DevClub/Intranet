@@ -1,11 +1,11 @@
 from django.db import models
 from django.conf import settings
 
-class Document(models.Model):
+class Ticket(models.Model):
     title = models.CharField(max_length=255)
-    file = models.FileField(upload_to='documents/')
-    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='documents')
-    department = models.ForeignKey('departments.Department', on_delete=models.CASCADE, related_name='documents')
+    description = models.TextField()
+    department = models.ForeignKey('departments.Department', on_delete=models.CASCADE, related_name='tickets')
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='tickets')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

@@ -30,6 +30,7 @@ urlpatterns = [
     path("api/departments/", include("departments.urls")),
     path("api/", include("employees.urls")),
     path("api/", include("documents.urls")),
+    path("api/", include("tickets.urls")),
 ]
 
 if settings.DEBUG:
