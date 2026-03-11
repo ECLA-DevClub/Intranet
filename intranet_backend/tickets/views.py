@@ -2,6 +2,7 @@ from rest_framework import viewsets, filters
 from .models import Ticket
 from .serializers import TicketSerializer
 from documents.permissions import IsAssignedToDepartment
+from audit.models import AuditLog
 
 class TicketViewSet(viewsets.ModelViewSet):
     """
@@ -28,3 +29,24 @@ class TicketViewSet(viewsets.ModelViewSet):
             return base_queryset.filter(department=user.department)
 
         return base_queryset.none()
+
+    def _log_action(self, action, obj):
+        AuditLog.objects.create(
+            user=self.request.user,
+            action=action,
+            object_type='Ticket',
+            object_id=obj.id,
+            metadata={'title': obj.title, 'department_id': obj.department_id if obj.department else None}
+        )
+
+    def perform_create(self, serializer):
+        obj = serializer.save()
+        self._log_action('CREATE', obj)
+
+    def perform_update(self, serializer):
+        obj = serializer.save()
+        self._log_action('UPDATE', obj)
+
+    def perform_destroy(self, instance):
+        self._log_action('DELETE', instance)
+        instance.delete()
