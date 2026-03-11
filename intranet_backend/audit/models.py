@@ -6,10 +6,12 @@ class AuditLog(models.Model):
         ('CREATE', 'Create'),
         ('UPDATE', 'Update'),
         ('DELETE', 'Delete'),
+        ('STATUS_CHANGE', 'Status Change'),
+        ('ASSIGN', 'Assign'),
     )
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name='audit_logs')
-    action = models.CharField(max_length=10, choices=ACTION_CHOICES)
+    action = models.CharField(max_length=20, choices=ACTION_CHOICES)
     object_type = models.CharField(max_length=50) # 'Document' or 'Ticket'
     object_id = models.PositiveIntegerField()
     timestamp = models.DateTimeField(auto_now_add=True)
