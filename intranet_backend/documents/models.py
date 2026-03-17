@@ -1,7 +1,10 @@
 from django.db import models
 from django.conf import settings
+from wagtail.snippets.models import register_snippet
+from wagtail.admin.panels import FieldPanel
 
 
+@register_snippet
 class Document(models.Model):
     title = models.CharField(max_length=255)
     file = models.FileField(upload_to='documents/')
@@ -25,7 +28,16 @@ class Document(models.Model):
     def __str__(self):
         return self.title
 
+    panels = [
+        FieldPanel('title'),
+        FieldPanel('file'),
+        FieldPanel('author'),
+        FieldPanel('department'),
+        FieldPanel('current_version'),
+    ]
 
+
+@register_snippet
 class DocumentVersion(models.Model):
     """Immutable snapshot of a document file at a specific version."""
     document = models.ForeignKey(
@@ -55,3 +67,11 @@ class DocumentVersion(models.Model):
 
     def __str__(self):
         return f"{self.document.title} v{self.version_number}"
+
+    panels = [
+        FieldPanel('document'),
+        FieldPanel('file'),
+        FieldPanel('version_number'),
+        FieldPanel('uploaded_by'),
+        FieldPanel('comment'),
+    ]
