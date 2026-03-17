@@ -1,62 +1,61 @@
-// intranet-frontend/app/page.tsx
+"use client";
 
-async function getPages() {
-  // Делаем запрос к API Wagtail
-  const res = await fetch('http://127.0.0.1:8000/api/v2/pages/', {
-    next: { revalidate: 10 }, 
-  });
+import Link from "next/link";
+import { useLanguage } from "@/components/i18n";
 
-  if (!res.ok) {
-    throw new Error('Failed to fetch data from Wagtail');
-  }
-
-  return res.json();
-}
-
-export default async function Home() {
-  const data = await getPages();
-  // Wagtail возвращает массив страниц в объекте items
-  const pages = data.items || [];
+export default function Home() {
+  const { t } = useLanguage();
+  const sections = [
+    {
+      title: t("home.section.employees.title"),
+      description: t("home.section.employees.description"),
+      href: "/employees",
+    },
+    {
+      title: t("home.section.tickets.title"),
+      description: t("home.section.tickets.description"),
+      href: "/tickets",
+    },
+    {
+      title: t("home.section.documents.title"),
+      description: t("home.section.documents.description"),
+      href: "/documents",
+    },
+  ];
 
   return (
-    <div className="min-h-screen bg-slate-50 p-8 font-sans">
-      <main className="max-w-4xl mx-auto">
-        
-        <header className="mb-12 border-b border-slate-200 pb-6">
-          <h1 className="text-4xl font-bold text-slate-800 tracking-tight">
-            Интранет Engineering College Light Academy
-          </h1>
-          <p className="text-slate-500 mt-2 text-lg">
-            Внутренний портал. Статус API: <span className="text-emerald-500 font-semibold">Подключено</span>
-          </p>
-        </header>
+    <div className="space-y-10">
+      <header className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+          {t("home.label")}
+        </p>
+        <h1 className="mt-3 text-3xl font-semibold text-slate-900">
+          {t("home.title")}
+        </h1>
+        <p className="mt-2 max-w-2xl text-sm text-slate-600">
+          {t("home.description")}
+        </p>
+      </header>
 
-        <section>
-          <h2 className="text-2xl font-semibold text-slate-700 mb-6">Опубликованные страницы:</h2>
-          
-          <div className="grid gap-4 md:grid-cols-2">
-            {pages.length > 0 ? (
-              pages.map((page: any) => (
-                <div 
-                  key={page.id} 
-                  className="p-6 bg-white rounded-xl shadow-sm border border-slate-200 hover:shadow-md transition-shadow"
-                >
-                  <h3 className="text-xl font-medium text-slate-900 mb-2">
-                    {page.title}
-                  </h3>
-                  <div className="text-sm text-slate-500 space-y-1">
-                    <p>ID страницы: {page.id}</p>
-                    <p>Тип контента: {page.meta.type}</p>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <p className="text-slate-500 italic">Нет доступных страниц. Добавьте их в админке Wagtail.</p>
-            )}
-          </div>
-        </section>
-
-      </main>
+      <section className="grid gap-6 md:grid-cols-3">
+        {sections.map((section) => (
+          <Link
+            key={section.title}
+            href={section.href}
+            className="animated-border group flex h-full flex-col justify-between rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+          >
+            <div>
+              <h2 className="text-lg font-semibold text-slate-800">
+                {section.title}
+              </h2>
+              <p className="mt-2 text-sm text-slate-600">{section.description}</p>
+            </div>
+            <span className="mt-6 text-sm font-medium text-slate-700 group-hover:text-slate-900">
+              {t("home.open")}
+            </span>
+          </Link>
+        ))}
+      </section>
     </div>
   );
 }

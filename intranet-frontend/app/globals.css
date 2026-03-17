@@ -1,8 +1,11 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f4f6f8;
+  --foreground: #1f2933;
+  --panel: #ffffff;
+  --muted: #6b7280;
+  --border: #d7dbe0;
 }
 
 @theme inline {
@@ -12,15 +15,188 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+body {
+  background: linear-gradient(180deg, #f7f8fa 0%, #eef1f4 100%);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), "Source Sans 3", sans-serif;
+}
+
+.nav-link {
+  position: relative;
+  border-radius: 0.5rem;
+  padding: 0.375rem 0.75rem;
+  color: #475569;
+  border: 1px solid transparent;
+  transition: color 0.2s ease, background 0.2s ease;
+}
+
+.nav-link::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 0.5rem;
+  padding: 1px;
+  background: linear-gradient(90deg, transparent 0%, #94a3b8 50%, transparent 100%);
+  background-size: 200% 200%;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  animation: navBorderMove 1.8s linear infinite;
+  pointer-events: none;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+}
+
+.nav-link:hover {
+  color: #0f172a;
+  background: #f1f5f9;
+  border-color: #e2e8f0;
+}
+
+.nav-link:hover::before {
+  opacity: 1;
+}
+
+.animated-border {
+  position: relative;
+  isolation: isolate;
+}
+
+.animated-border::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(90deg, transparent 0%, #94a3b8 50%, transparent 100%);
+  background-size: 200% 200%;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  animation: navBorderMove 1.8s linear infinite;
+  pointer-events: none;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+}
+
+.animated-border:hover::before {
+  opacity: 1;
+}
+
+@keyframes navBorderMove {
+  0% {
+    background-position: 0% 0%;
+  }
+  25% {
+    background-position: 100% 0%;
+  }
+  50% {
+    background-position: 100% 100%;
+  }
+  75% {
+    background-position: 0% 100%;
+  }
+  100% {
+    background-position: 0% 0%;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ===== DARK MODE ===== */
+html.dark {
+  color-scheme: dark;
+}
+
+html.dark body {
+  background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+  color: #e2e8f0;
+}
+
+/* Backgrounds */
+html.dark .bg-white {
+  background-color: #1e293b !important;
+}
+
+html.dark .bg-white\/90,
+html.dark .bg-white\/80 {
+  background-color: rgba(15, 23, 42, 0.9) !important;
+}
+
+html.dark .bg-slate-100 {
+  background-color: #0f172a !important;
+}
+
+html.dark .bg-slate-50 {
+  background-color: #1e293b !important;
+}
+
+html.dark .bg-slate-200 {
+  background-color: #334155 !important;
+}
+
+/* Колored badge backgrounds */
+html.dark .bg-emerald-50 { background-color: rgba(6, 78, 59, 0.35) !important; }
+html.dark .bg-sky-50     { background-color: rgba(8, 47, 73, 0.35) !important; }
+html.dark .bg-amber-50   { background-color: rgba(78, 45, 0, 0.35) !important; }
+html.dark .bg-rose-50    { background-color: rgba(76, 5, 25, 0.35) !important; }
+html.dark .bg-indigo-50  { background-color: rgba(30, 27, 75, 0.35) !important; }
+html.dark .bg-orange-50  { background-color: rgba(67, 20, 7, 0.35) !important; }
+
+/* Hover backgrounds */
+html.dark .hover\:bg-slate-100:hover { background-color: #334155 !important; }
+html.dark .hover\:bg-slate-200:hover { background-color: #475569 !important; }
+
+/* Borders */
+html.dark .border-slate-200 { border-color: #334155 !important; }
+html.dark .border-slate-400 { border-color: #475569 !important; }
+html.dark .border-emerald-200 { border-color: #065f46 !important; }
+html.dark .border-sky-200     { border-color: #0c4a6e !important; }
+html.dark .border-amber-200   { border-color: #78350f !important; }
+html.dark .border-rose-200    { border-color: #9f1239 !important; }
+html.dark .border-indigo-200  { border-color: #3730a3 !important; }
+html.dark .border-orange-200  { border-color: #9a3412 !important; }
+
+/* Text — slate */
+html.dark .text-slate-900 { color: #f1f5f9 !important; }
+html.dark .text-slate-800 { color: #e2e8f0 !important; }
+html.dark .text-slate-700 { color: #cbd5e1 !important; }
+html.dark .text-slate-600 { color: #94a3b8 !important; }
+html.dark .text-slate-500 { color: #64748b !important; }
+html.dark .text-slate-400 { color: #475569 !important; }
+
+/* Text — badge colours (brighter for dark bg) */
+html.dark .text-emerald-700 { color: #34d399 !important; }
+html.dark .text-sky-700     { color: #38bdf8 !important; }
+html.dark .text-amber-700   { color: #fbbf24 !important; }
+html.dark .text-rose-700    { color: #f87171 !important; }
+html.dark .text-indigo-700  { color: #818cf8 !important; }
+html.dark .text-orange-700  { color: #fb923c !important; }
+
+/* Shadows */
+html.dark .shadow-sm { box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.5) !important; }
+html.dark .hover\:shadow-md:hover { box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.6) !important; }
+
+/* Inputs */
+html.dark input,
+html.dark select,
+html.dark textarea {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+  color: #e2e8f0 !important;
+}
+
+html.dark input::placeholder,
+html.dark textarea::placeholder {
+  color: #475569 !important;
+}
+
+html.dark .focus\:border-slate-400:focus { border-color: #475569 !important; }
+
+/* Nav links */
+html.dark .nav-link { color: #94a3b8; }
+html.dark .nav-link:hover {
+  color: #f1f5f9 !important;
+  background: #1e293b !important;
+  border-color: #334155 !important;
 }
