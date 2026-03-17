@@ -1,5 +1,8 @@
 from django.db import models
+from wagtail.snippets.models import register_snippet
+from wagtail.admin.panels import FieldPanel
 
+@register_snippet
 class Employee(models.Model):
     name = models.CharField(max_length=255)
     email = models.EmailField(unique=True)
@@ -12,3 +15,11 @@ class Employee(models.Model):
 
     def __str__(self):
         return f"{self.name} ({self.position})"
+
+    panels = [
+        FieldPanel('name'),
+        FieldPanel('email'),
+        FieldPanel('position'),
+        FieldPanel('department'),
+        FieldPanel('role'),
+    ]

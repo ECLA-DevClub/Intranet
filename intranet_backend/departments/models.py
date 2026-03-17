@@ -1,6 +1,9 @@
 from django.db import models
+from wagtail.snippets.models import register_snippet
+from wagtail.admin.panels import FieldPanel
 
 
+@register_snippet
 class Department(models.Model):
     """Company department (e.g. Engineering, HR, Marketing)."""
 
@@ -25,3 +28,8 @@ class Department(models.Model):
 
     def __str__(self) -> str:
         return self.name
+
+    panels = [
+        FieldPanel('name'),
+        FieldPanel('description'),
+    ]

@@ -1,7 +1,10 @@
 from django.db import models
 from django.conf import settings
+from wagtail.snippets.models import register_snippet
+from wagtail.admin.panels import FieldPanel
 
 
+@register_snippet
 class Ticket(models.Model):
     class Status(models.TextChoices):
         OPEN = 'open', 'Open'
@@ -53,3 +56,12 @@ class Ticket(models.Model):
         """Check if the status transition is valid according to TRANSITION_MAP."""
         allowed = self.TRANSITION_MAP.get(self.status, set())
         return new_status in allowed
+
+    panels = [
+        FieldPanel('title'),
+        FieldPanel('description'),
+        FieldPanel('status'),
+        FieldPanel('department'),
+        FieldPanel('assignee'),
+        FieldPanel('created_by'),
+    ]
