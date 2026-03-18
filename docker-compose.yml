@@ -23,10 +23,9 @@ services:
       - SECRET_KEY=${SECRET_KEY}
       - DJANGO_SETTINGS_MODULE=${DJANGO_SETTINGS_MODULE:-intranet_backend.settings.dev}
       - DEBUG=${DEBUG:-True}
-      - ALLOWED_HOSTS=${ALLOWED_HOSTS:-localhost,127.0.0.1,backend}
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS:-localhost,127.0.0.1,backend,nginx}
       - SECURE_SSL_REDIRECT=${SECURE_SSL_REDIRECT:-False}
-    ports:
-      - "8000:8000"
+    # No ports exposed directly, handled by nginx
     depends_on:
       - db
 
@@ -34,12 +33,24 @@ services:
     build:
       context: ./intranet-frontend
       dockerfile: Dockerfile
-    ports:
-      - "3000:3000"
+    # No ports exposed directly, handled by nginx
     environment:
-      - NEXT_PUBLIC_API_URL=http://localhost:8000/api/v2
+      - NEXT_PUBLIC_API_URL=http://localhost/api/v2
     depends_on:
       - backend
+
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    volumes:
+      - backend_static:/app/static:ro
+      - backend_media:/app/media:ro
+    depends_on:
+      - backend
+      - frontend
 
 volumes:
   postgres_data:
