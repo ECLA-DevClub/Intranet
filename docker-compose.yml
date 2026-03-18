@@ -18,6 +18,7 @@ services:
       - ./intranet_backend:/app
       - backend_static:/app/static
       - backend_media:/app/media
+      - backend_logs:/app/logs
     environment:
       - DATABASE_URL=${DATABASE_URL:-postgres://postgres:postgres@db:5432/postgres}
       - SECRET_KEY=${SECRET_KEY}
@@ -56,3 +57,4 @@ volumes:
   postgres_data:
   backend_static:
   backend_media:
+  backend_logs:
