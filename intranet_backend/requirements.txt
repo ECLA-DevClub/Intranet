@@ -3,3 +3,9 @@ wagtail==7.3rc1
 djangorestframework-simplejwt>=5.3,<6
 django-storages>=1.14,<2
 boto3>=1.35,<2
+<<<<<<< HEAD
+=======
+psycopg2-binary>=2.9.9
+dj-database-url>=2.1.0
+python-dotenv>=1.0.1
+>>>>>>> b8aa2b1 (Setup Docker environment)
