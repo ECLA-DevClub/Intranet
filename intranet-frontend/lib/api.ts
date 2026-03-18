@@ -254,22 +254,6 @@ export function logout(): void {
   logoutLocal();
 }
 
-async function requestJson<T>(path: string, fallback: T): Promise<T> {
-  if (useMocks) {
-    return fallback;
-  }
-
-  try {
-    const response = await authFetch(path);
-    if (!response.ok) {
-      throw new Error(`Request failed: ${response.status}`);
-    }
-    return (await response.json()) as T;
-  } catch {
-    return fallback;
-  }
-}
-
 export async function getEmployees(): Promise<Employee[]> {
   if (useMocks) {
     return employees;

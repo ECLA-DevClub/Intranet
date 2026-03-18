@@ -9,9 +9,11 @@ export default function ThemeToggle() {
     const stored = localStorage.getItem("theme");
     const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
     const isDark = stored === "dark" || (!stored && prefersDark);
-    setDark(isDark);
+    if (isDark !== dark) {
+      setDark(isDark);
+    }
     document.documentElement.classList.toggle("dark", isDark);
-  }, []);
+  }, [dark]);
 
   function toggle() {
     const next = !dark;
