@@ -15,14 +15,11 @@ import os
 from datetime import timedelta
 from pathlib import Path
 
-<<<<<<< HEAD
-=======
 import dj_database_url
 from dotenv import load_dotenv
 
 load_dotenv()
 
->>>>>>> b8aa2b1 (Setup Docker environment)
 PROJECT_DIR = Path(__file__).resolve().parent.parent
 BASE_DIR = PROJECT_DIR.parent
 
@@ -30,8 +27,6 @@ BASE_DIR = PROJECT_DIR.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
-<<<<<<< HEAD
-=======
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get("SECRET_KEY", "django-insecure-fallback-for-dev-only")
 
@@ -40,7 +35,6 @@ DEBUG = os.environ.get("DEBUG", "True").lower() == "true"
 
 ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "*").split(",")
 
->>>>>>> b8aa2b1 (Setup Docker environment)
 
 # Application definition
 
@@ -117,18 +111,11 @@ WSGI_APPLICATION = "intranet_backend.wsgi.application"
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 DATABASES = {
-<<<<<<< HEAD
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
-=======
     "default": dj_database_url.config(
         default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
         conn_max_age=600,
         conn_health_checks=True,
     )
->>>>>>> b8aa2b1 (Setup Docker environment)
 }
 
 
