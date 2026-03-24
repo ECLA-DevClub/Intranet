@@ -395,10 +395,10 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const stored = window.localStorage.getItem(STORAGE_KEY) as Language | null;
-    if (stored === "ru" || stored === "en") {
-      setLang(stored);
+    if ((stored === "ru" || stored === "en") && stored !== lang) {
+      setLang(stored); // eslint-disable-line react-hooks/set-state-in-effect
     }
-  }, []);
+  }, [lang]);
 
   useEffect(() => {
     document.documentElement.lang = lang;

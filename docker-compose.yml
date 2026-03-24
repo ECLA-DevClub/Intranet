@@ -1,0 +1,60 @@
+services:
+  db:
+    image: postgres:16-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - "5432:5432"
+
+  backend:
+    build:
+      context: ./intranet_backend
+      dockerfile: Dockerfile
+    volumes:
+      - ./intranet_backend:/app
+      - backend_static:/app/static
+      - backend_media:/app/media
+      - backend_logs:/app/logs
+    environment:
+      - DATABASE_URL=${DATABASE_URL:-postgres://postgres:postgres@db:5432/postgres}
+      - SECRET_KEY=${SECRET_KEY}
+      - DJANGO_SETTINGS_MODULE=${DJANGO_SETTINGS_MODULE:-intranet_backend.settings.dev}
+      - DEBUG=${DEBUG:-True}
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS:-localhost,127.0.0.1,backend,nginx}
+      - SECURE_SSL_REDIRECT=${SECURE_SSL_REDIRECT:-False}
+    # No ports exposed directly, handled by nginx
+    depends_on:
+      - db
+
+  frontend:
+    build:
+      context: ./intranet-frontend
+      dockerfile: Dockerfile
+    # No ports exposed directly, handled by nginx
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost/api/v2
+    depends_on:
+      - backend
+
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    volumes:
+      - backend_static:/app/static:ro
+      - backend_media:/app/media:ro
+    depends_on:
+      - backend
+      - frontend
+
+volumes:
+  postgres_data:
+  backend_static:
+  backend_media:
+  backend_logs:
