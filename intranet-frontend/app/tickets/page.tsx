@@ -1,22 +1,19 @@
 "use client";
 
 import { useEffect, useMemo, useState, type FormEvent } from "react";
-import type { Ticket } from "@/lib/mockData";
-import { createTicket, deleteTicket, getTickets } from "@/lib/api";
+import type { Ticket, Department, Employee } from "@/lib/api";
+import { createTicket, deleteTicket, getTickets, getDepartments, getEmployees, updateTicketStatus, assignTicket } from "@/lib/api";
 import { useLanguage } from "@/components/i18n";
 
-const statusStyles: Record<Ticket["status"], string> = {
-  Open: "bg-sky-50 text-sky-700 border-sky-200",
-  "In Progress": "bg-amber-50 text-amber-700 border-amber-200",
-  Waiting: "bg-slate-50 text-slate-600 border-slate-200",
-  Resolved: "bg-emerald-50 text-emerald-700 border-emerald-200",
-};
+const allValue = "ALL";
 
-const priorityStyles: Record<Ticket["priority"], string> = {
-  Low: "bg-slate-50 text-slate-600 border-slate-200",
-  Medium: "bg-indigo-50 text-indigo-700 border-indigo-200",
-  High: "bg-orange-50 text-orange-700 border-orange-200",
-  Critical: "bg-rose-50 text-rose-700 border-rose-200",
+// Status localized labels map (could be moved to i18n but keeping simple)
+// Moved inside component to use translation hook
+
+const statusStyles: Record<string, string> = {
+  open: "bg-sky-50 text-sky-700 border-sky-200",
+  in_progress: "bg-amber-50 text-amber-700 border-amber-200",
+  closed: "bg-emerald-50 text-emerald-700 border-emerald-200",
 };
 
 function FilterPill({
@@ -33,7 +30,7 @@ function FilterPill({
       type="button"
       onClick={onClick}
       aria-pressed={active}
-      className={`animated-border rounded-full border px-3 py-1 text-xs font-medium transition ${
+      className={`animated-border rounded-full border px-4 py-2 text-sm font-medium transition ${
         active
           ? "border-slate-400 bg-slate-200 text-slate-900"
           : "border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100"
@@ -46,429 +43,271 @@ function FilterPill({
 
 export default function TicketsPage() {
   const { t } = useLanguage();
-  const allValue = "ALL";
   const [tickets, setTickets] = useState<Ticket[]>([]);
+  const [departments, setDepartments] = useState<Department[]>([]);
+  const [employees, setEmployees] = useState<Employee[]>([]);
   const [status, setStatus] = useState(allValue);
-  const [priority, setPriority] = useState(allValue);
+  
   const [form, setForm] = useState({
     title: "",
-    category: "",
-    requester: "",
-    assignee: "",
-    status: "Open" as Ticket["status"],
-    priority: "Medium" as Ticket["priority"],
+    description: "",
+    department: "", // ID as string
   });
+
+  const statusLabels: Record<string, string> = useMemo(() => ({
+    open: t("tickets.status.open"),
+    in_progress: t("tickets.status.progress"),
+    closed: t("tickets.status.resolved"),
+  }), [t]);
 
   useEffect(() => {
     let active = true;
-    getTickets().then((data) => {
+    Promise.all([getTickets(), getDepartments(), getEmployees()]).then(([ticketsData, deptsData, empsData]) => {
       if (active) {
-        setTickets(data);
+        setTickets(ticketsData);
+        setDepartments(deptsData);
+        setEmployees(empsData);
       }
-    });
+    }).catch(console.error);
     return () => {
       active = false;
     };
   }, []);
 
-  const statuses = useMemo(() => {
-    const values = new Set(tickets.map((item) => item.status));
-    return [allValue, ...Array.from(values)];
-  }, [tickets]);
-
-  const priorities = useMemo(() => {
-    const values = new Set(tickets.map((item) => item.priority));
-    return [allValue, ...Array.from(values)];
-  }, [tickets]);
-
   const filtered = useMemo(() => {
     return tickets.filter((item) => {
-      const statusOk = status === allValue || item.status === status;
-      const priorityOk = priority === allValue || item.priority === priority;
-      return statusOk && priorityOk;
+      return status === allValue || item.status === status;
     });
-  }, [tickets, status, priority]);
-
-  const statusLabels: Record<Ticket["status"], string> = {
-    Open: t("tickets.status.open"),
-    "In Progress": t("tickets.status.progress"),
-    Waiting: t("tickets.status.waiting"),
-    Resolved: t("tickets.status.resolved"),
-  };
-
-  const priorityLabels: Record<Ticket["priority"], string> = {
-    Low: t("tickets.priority.low"),
-    Medium: t("tickets.priority.medium"),
-    High: t("tickets.priority.high"),
-    Critical: t("tickets.priority.critical"),
-  };
+  }, [tickets, status]);
 
   const handleAdd = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const trimmed = {
-      title: form.title.trim(),
-      category: form.category.trim(),
-      requester: form.requester.trim(),
-      assignee: form.assignee.trim(),
-    };
-
-    if (!trimmed.title) {
-      return;
-    }
-
-    const fallbackNext: Ticket = {
-      id: `TCK-${Date.now()}`,
-      title: trimmed.title,
-      category: trimmed.category || "General",
-      requester: trimmed.requester || "-",
-      assignee: trimmed.assignee || "-",
-      status: form.status,
-      priority: form.priority,
-      updated: new Date().toLocaleString("ru-RU", {
-        day: "2-digit",
-        month: "long",
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
-    };
-
-    // Пытаемся создать в бэкенде (он требует title/description/department).
-    // Department берется из /api/auth/me/ (см. lib/api.ts).
-    const description = [
-      trimmed.category ? `Category: ${trimmed.category}` : null,
-      trimmed.requester ? `Requester: ${trimmed.requester}` : null,
-      trimmed.assignee ? `Assignee: ${trimmed.assignee}` : null,
-    ]
-      .filter(Boolean)
-      .join("\n")
-      .trim();
+    if (!form.title || !form.department) return;
 
     createTicket({
-      title: trimmed.title,
-      description: description.length > 0 ? description : "-",
-    })
-      .then((created) => {
-        setTickets((prev) => [created, ...prev]);
-      })
-      .catch(() => {
-        // Если бэкенд недоступен/не настроен — оставляем локальное поведение.
-        setTickets((prev) => [fallbackNext, ...prev]);
-      });
-
-    setForm({
-      title: "",
-      category: "",
-      requester: "",
-      assignee: "",
-      status: "Open",
-      priority: "Medium",
+        title: form.title,
+        description: form.description,
+        department: Number(form.department) // Convert string ID to number
+    }).then((created) => {
+        setTickets(prev => [created, ...prev]);
+        setForm({ title: "", description: "", department: "" });
+    }).catch(err => {
+        alert(t("tickets.create.error"));
+        console.error(err);
     });
   };
 
-  const handleDelete = (id: string) => {
-    const found = tickets.find((item) => item.id === id);
-    const apiId = found?.apiId;
+  const handleStatusChange = (id: number, newStatus: "in_progress" | "closed") => {
+      updateTicketStatus(id, newStatus).then((updated) => {
+          setTickets(prev => prev.map(t => t.id === id ? updated : t));
+      }).catch(err => {
+          alert(t("tickets.update.error"));
+          console.error(err);
+      });
+  };
 
-    if (apiId) {
-      deleteTicket(apiId)
-        .then(() => {
-          setTickets((prev) => prev.filter((item) => item.id !== id));
-        })
-        .catch(() => {
-          // фолбек: просто убираем из UI
-          setTickets((prev) => prev.filter((item) => item.id !== id));
-        });
-      return;
-    }
+  const handleDelete = (id: number) => {
+      if (!confirm(t("common.confirm"))) return;
+      deleteTicket(id).then(() => {
+          setTickets(prev => prev.filter(t => t.id !== id));
+      }).catch(err => {
+          alert(t("tickets.delete.error"));
+          console.error(err);
+      });
+  };
 
-    setTickets((prev) => prev.filter((item) => item.id !== id));
+  const handleAssign = (id: number, assigneeId: string) => {
+    if (!assigneeId) return;
+    const empId = Number(assigneeId);
+    assignTicket(id, empId)
+      .then(() => {
+        setTickets((prev) =>
+          prev.map((t) => (t.id === id ? { ...t, assignee: empId } : t))
+        );
+      })
+      .catch((err) => {
+        alert(t("tickets.assign.error"));
+        console.error(err);
+      });
+  };
+  
+  // Helper to get department name from ID
+  const getDeptName = (id: number | Department) => {
+      if (typeof id === 'object') return id.name;
+      const d = departments.find(dep => dep.id === id);
+      return d ? d.name : `Dept #${id}`;
   };
 
   return (
     <div className="space-y-8">
-      <header className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-        <div>
+      <header>
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
             {t("tickets.label")}
           </p>
-          <h1 className="mt-2 text-2xl font-semibold text-slate-900">{t("tickets.title")}</h1>
+          <h1 className="mt-2 text-2xl font-semibold text-slate-900">
+            {t("tickets.title")}
+          </h1>
           <p className="mt-1 text-sm text-slate-600">
             {t("tickets.subtitle")}
           </p>
-        </div>
-        <div className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-600">
-          {t("common.showing")} <span className="font-semibold text-slate-800">{filtered.length}</span>
-        </div>
       </header>
 
+      {/* New Ticket Form */}
       <section className="animated-border rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-              {t("tickets.new.title")}
-            </p>
-            <p className="mt-1 text-sm text-slate-600">
-              {t("tickets.new.subtitle")}
-            </p>
-          </div>
-          <button
-            type="submit"
-            form="ticket-form"
-            className="animated-border group inline-flex items-center justify-center rounded-2xl border border-slate-200 bg-white px-6 py-3 text-sm font-semibold text-slate-800 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
-          >
-            {t("tickets.add")}
-          </button>
-        </div>
-        <form id="ticket-form" onSubmit={handleAdd} className="mt-6 grid gap-4 md:grid-cols-3">
-          <div className="space-y-2 md:col-span-3">
+        <h2 className="text-sm font-semibold text-slate-900 mb-4">{t("tickets.new.title")}</h2>
+        <form onSubmit={handleAdd} className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div className="space-y-2">
             <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
               {t("tickets.form.title")}
             </label>
             <input
               value={form.title}
-              onChange={(event) => setForm({ ...form, title: event.target.value })}
-              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700 focus:border-slate-400 focus:outline-none"
+              onChange={(e) => setForm({ ...form, title: e.target.value })}
+              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm focus:border-slate-400 focus:outline-none"
               placeholder={t("tickets.form.title.placeholder")}
               required
             />
           </div>
           <div className="space-y-2">
             <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-              {t("tickets.form.category")}
-            </label>
-            <input
-              value={form.category}
-              onChange={(event) => setForm({ ...form, category: event.target.value })}
-              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700 focus:border-slate-400 focus:outline-none"
-              placeholder={t("tickets.form.category.placeholder")}
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-              {t("tickets.form.requester")}
-            </label>
-            <input
-              value={form.requester}
-              onChange={(event) => setForm({ ...form, requester: event.target.value })}
-              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700 focus:border-slate-400 focus:outline-none"
-              placeholder={t("tickets.form.person.placeholder")}
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-              {t("tickets.form.assignee")}
-            </label>
-            <input
-              value={form.assignee}
-              onChange={(event) => setForm({ ...form, assignee: event.target.value })}
-              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700 focus:border-slate-400 focus:outline-none"
-              placeholder={t("tickets.form.person.placeholder")}
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-              {t("tickets.form.status")}
+               {t("tickets.form.department")}
             </label>
             <select
-              value={form.status}
-              onChange={(event) =>
-                setForm({ ...form, status: event.target.value as Ticket["status"] })
-              }
-              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700 focus:border-slate-400 focus:outline-none"
+              value={form.department}
+              onChange={(e) => setForm({ ...form, department: e.target.value })}
+              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm focus:border-slate-400 focus:outline-none"
+              required
             >
-              <option value="Open">{statusLabels.Open}</option>
-              <option value="In Progress">{statusLabels["In Progress"]}</option>
-              <option value="Waiting">{statusLabels.Waiting}</option>
-              <option value="Resolved">{statusLabels.Resolved}</option>
+                <option value="">{t("common.select.department")}</option>
+                {departments.map(d => (
+                    <option key={d.id} value={d.id}>{d.name}</option> // ID Value
+                ))}
             </select>
           </div>
-          <div className="space-y-2">
+          <div className="col-span-1 md:col-span-2 lg:col-span-3 space-y-2">
             <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-              {t("tickets.form.priority")}
+              {t("tickets.form.description")}
             </label>
-            <select
-              value={form.priority}
-              onChange={(event) =>
-                setForm({ ...form, priority: event.target.value as Ticket["priority"] })
-              }
-              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700 focus:border-slate-400 focus:outline-none"
-            >
-              <option value="Low">{priorityLabels.Low}</option>
-              <option value="Medium">{priorityLabels.Medium}</option>
-              <option value="High">{priorityLabels.High}</option>
-              <option value="Critical">{priorityLabels.Critical}</option>
-            </select>
+            <textarea
+              value={form.description}
+              onChange={(e) => setForm({ ...form, description: e.target.value })}
+              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm focus:border-slate-400 focus:outline-none"
+              rows={3}
+              placeholder={t("tickets.form.description.placeholder")}
+              required
+            />
+          </div>
+          <div className="col-span-1 md:col-span-2 lg:col-span-3 flex justify-end">
+             <button
+               type="submit"
+               className="animated-border rounded-xl bg-slate-900 px-6 py-2 text-sm font-medium text-white shadow-sm hover:bg-slate-800"
+             >
+               {t("tickets.add")}
+             </button>
           </div>
         </form>
       </section>
 
-      <section className="animated-border grid gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm md:grid-cols-2">
-        <div className="space-y-3">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-            {t("tickets.form.status")}
-          </p>
-          <div className="flex flex-wrap gap-2">
-            {statuses.map((value) => (
-              <FilterPill
-                key={value}
-                label={value === allValue ? t("common.all") : statusLabels[value as Ticket["status"]]}
-                active={status === value}
-                onClick={() => setStatus(value)}
-              />
-            ))}
-          </div>
-        </div>
-        <div className="space-y-3">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-            {t("tickets.form.priority")}
-          </p>
-          <div className="flex flex-wrap gap-2">
-            {priorities.map((value) => (
-              <FilterPill
-                key={value}
-                label={value === allValue ? t("common.all") : priorityLabels[value as Ticket["priority"]]}
-                active={priority === value}
-                onClick={() => setPriority(value)}
-              />
-            ))}
-          </div>
-        </div>
-        <div className="md:col-span-2 flex flex-wrap gap-2 text-xs text-slate-500">
-          <button
-            type="button"
-            onClick={() => {
-              setStatus(allValue);
-              setPriority(allValue);
-            }}
-            className="animated-border rounded-full border border-slate-200 bg-slate-50 px-3 py-1 font-medium text-slate-600 hover:bg-slate-100"
-          >
-            {t("common.reset")}
-          </button>
-        </div>
+      {/* Filter */}
+      <section className="flex flex-wrap gap-2">
+          <FilterPill
+            label={t("common.all")}
+            active={status === allValue}
+            onClick={() => setStatus(allValue)}
+          />
+          {Object.keys(statusLabels).map((key) => (
+             <FilterPill
+                key={key}
+                label={statusLabels[key]}
+                active={status === key}
+                onClick={() => setStatus(key)}
+             />
+          ))}
       </section>
 
-      {filtered.length === 0 ? (
-        <section className="animated-border rounded-2xl border border-dashed border-slate-200 bg-white p-8 text-center text-sm text-slate-500">
-          {t("tickets.empty")}
-        </section>
-      ) : (
-        <section className="animated-border hidden overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm md:block">
-          <table className="w-full text-left text-sm">
-            <thead className="bg-slate-50 text-xs uppercase tracking-[0.2em] text-slate-400">
-              <tr>
-                <th className="px-6 py-3">{t("tickets.table.ticket")}</th>
-                <th className="px-6 py-3">{t("tickets.table.status")}</th>
-                <th className="px-6 py-3">{t("tickets.table.priority")}</th>
-                <th className="px-6 py-3">{t("tickets.table.assignee")}</th>
-                <th className="px-6 py-3">{t("tickets.table.updated")}</th>
-                <th className="px-6 py-3 text-right">{t("tickets.table.actions")}</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-200">
-              {filtered.map((item) => (
-                <tr key={item.id} className="hover:bg-slate-50">
-                  <td className="px-6 py-4">
-                    <div className="font-medium text-slate-900">{item.title}</div>
-                    <div className="text-xs text-slate-500">
-                      {item.id} • {item.category} • {item.requester}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <button
-                      type="button"
-                      onClick={() => setStatus(item.status)}
-                      className={`rounded-full border px-3 py-1 text-xs ${
-                        statusStyles[item.status]
-                      }`}
-                    >
-                      {statusLabels[item.status]}
-                    </button>
-                  </td>
-                  <td className="px-6 py-4">
-                    <button
-                      type="button"
-                      onClick={() => setPriority(item.priority)}
-                      className={`rounded-full border px-3 py-1 text-xs ${
-                        priorityStyles[item.priority]
-                      }`}
-                    >
-                      {priorityLabels[item.priority]}
-                    </button>
-                  </td>
-                  <td className="px-6 py-4 text-slate-600">{item.assignee}</td>
-                  <td className="px-6 py-4 text-slate-600">{item.updated}</td>
-                  <td className="px-6 py-4 text-right">
-                    <button
-                      type="button"
-                      onClick={() => handleDelete(item.id)}
-                      className="animated-border rounded-full border border-slate-200 bg-white px-3 py-1 text-xs text-slate-500 transition hover:border-slate-300 hover:text-slate-700"
-                    >
-                      {t("common.delete")}
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </section>
-      )}
-
-      {filtered.length > 0 && (
-        <section className="grid gap-4 md:hidden">
-          {filtered.map((item) => (
-            <article
-              key={item.id}
-              className="animated-border rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
-            >
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <h2 className="text-base font-semibold text-slate-900">
-                    {item.title}
-                  </h2>
-                  <p className="text-xs text-slate-500">
-                    {item.id} • {item.category}
-                  </p>
-                </div>
-                <div className="flex flex-col gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setStatus(item.status)}
-                    className={`rounded-full border px-3 py-1 text-xs ${
-                      statusStyles[item.status]
-                    }`}
-                  >
-                    {statusLabels[item.status]}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setPriority(item.priority)}
-                    className={`rounded-full border px-3 py-1 text-xs ${
-                      priorityStyles[item.priority]
-                    }`}
-                  >
-                    {priorityLabels[item.priority]}
-                  </button>
-                </div>
-              </div>
-              <div className="mt-4 text-xs text-slate-600">
-                {t("tickets.meta.assignee")} {item.assignee}
-              </div>
-              <div className="mt-1 text-xs text-slate-500">
-                {t("tickets.meta.updated")} {item.updated}
-              </div>
-              <div className="mt-4">
-                <button
-                  type="button"
-                  onClick={() => handleDelete(item.id)}
-                  className="animated-border rounded-full border border-slate-200 bg-white px-3 py-1 text-xs text-slate-500"
+      {/* List */}
+      <section className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {filtered.map((ticket) => (
+          <div
+            key={ticket.id}
+            className="animated-border group relative flex flex-col justify-between rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+          >
+            <div>
+              <div className="flex items-start justify-between">
+                <span className={`inline-flex items-center rounded-lg px-2.5 py-0.5 text-xs font-medium border ${statusStyles[ticket.status]}`}>
+                   {statusLabels[ticket.status] ?? ticket.status}
+                </span>
+                <button 
+                  onClick={() => handleDelete(ticket.id)}
+                  className="text-slate-400 hover:text-rose-500"
+                  title={t("common.delete")}
                 >
-                  {t("common.delete")}
+                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                   </svg>
                 </button>
               </div>
-            </article>
-          ))}
-        </section>
-      )}
+              <h3 className="mt-3 font-semibold text-slate-900">{ticket.title}</h3>
+              <p className="mt-1 text-sm text-slate-500 line-clamp-2">{ticket.description}</p>
+              
+              <div className="mt-4 flex flex-col gap-1 text-xs text-slate-500">
+                  <div className="flex justify-between">
+                      <span>{t("common.dept")}</span>
+                      <span className="font-medium text-slate-700">{getDeptName(ticket.department)}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span>{t("common.assignee")}</span>
+                    <select
+                      className="max-w-[140px] truncate rounded border border-slate-200 bg-white px-2 py-1 text-xs text-slate-700 focus:border-slate-400 focus:outline-none"
+                      value={ticket.assignee || ""}
+                      onChange={(e) => handleAssign(ticket.id, e.target.value)}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <option value="">{t("common.unassigned")}</option>
+                      {employees.map((emp) => (
+                        <option key={emp.id} value={emp.id}>
+                          {emp.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="flex justify-between">
+                     <span>{t("common.created")}</span>
+                     <span>{new Date(ticket.created_at).toLocaleDateString()}</span>
+                  </div>
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="mt-4 border-t border-slate-100 pt-3 flex justify-end gap-2">
+               {ticket.status === 'open' && (
+                  <button 
+                    onClick={() => handleStatusChange(ticket.id, 'in_progress')}
+                    className="text-xs font-medium text-sky-600 hover:text-sky-700"
+                  >
+                    {t("tickets.action.start")}
+                  </button>
+               )}
+               {ticket.status === 'in_progress' && (
+                  <button 
+                    onClick={() => handleStatusChange(ticket.id, 'closed')}
+                    className="text-xs font-medium text-emerald-600 hover:text-emerald-700"
+                  >
+                    {t("tickets.action.close")}
+                  </button>
+               )}
+               {ticket.status === 'closed' && (
+                   <span className="text-xs text-slate-400">{t("tickets.action.archived")}</span>
+               )}
+            </div>
+          </div>
+        ))}
+        {filtered.length === 0 && (
+          <div className="col-span-full py-10 text-center text-sm text-slate-500">
+            {t("tickets.empty")}
+          </div>
+        )}
+      </section>
     </div>
   );
 }

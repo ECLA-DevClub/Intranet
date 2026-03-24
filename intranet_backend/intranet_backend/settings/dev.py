@@ -16,3 +16,5 @@ try:
     from .local import *
 except ImportError:
     pass
+
+CORS_ALLOW_ALL_ORIGINS = True

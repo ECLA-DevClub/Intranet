@@ -21,6 +21,11 @@ export default function Home() {
       description: t("home.section.documents.description"),
       href: "/documents",
     },
+    {
+      title: t("home.section.departments.title"),
+      description: t("home.section.departments.description"),
+      href: "/departments",
+    },
   ];
 
   return (
@@ -37,7 +42,7 @@ export default function Home() {
         </p>
       </header>
 
-      <section className="grid gap-6 md:grid-cols-3">
+      <section className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {sections.map((section) => (
           <Link
             key={section.title}
