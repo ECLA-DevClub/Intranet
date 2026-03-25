@@ -4,12 +4,16 @@ import { useEffect, useState, type FormEvent } from "react";
 import type { Department } from "@/lib/api";
 import { createDepartment, deleteDepartment, getDepartments } from "@/lib/api";
 import { useLanguage } from "@/components/i18n";
+import ConfirmDialog from "@/components/ConfirmDialog";
 
 export default function DepartmentsPage() {
   const { t } = useLanguage();
   const [departments, setDepartments] = useState<Department[]>([]);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
+  
+  // Confirmation state
+  const [deletingId, setDeletingId] = useState<number | null>(null);
 
   useEffect(() => {
     getDepartments().then(setDepartments).catch(console.error);
@@ -31,15 +35,19 @@ export default function DepartmentsPage() {
       });
   };
 
-  const handleDelete = (id: number) => {
-    if (!confirm(t("departments.delete.confirm"))) return;
-    deleteDepartment(id)
+  const confirmDelete = () => {
+    if (deletingId === null) return;
+    
+    deleteDepartment(deletingId)
       .then(() => {
-        setDepartments((prev) => prev.filter((d) => d.id !== id));
+        setDepartments((prev) => prev.filter((d) => d.id !== deletingId));
       })
       .catch((err) => {
         alert(t("departments.delete.error"));
         console.error(err);
+      })
+      .finally(() => {
+        setDeletingId(null);
       });
   };
 
@@ -106,7 +114,7 @@ export default function DepartmentsPage() {
               <div className="flex items-start justify-between">
                 <h3 className="font-semibold text-slate-900">{dept.name}</h3>
                 <button
-                  onClick={() => handleDelete(dept.id)}
+                  onClick={() => setDeletingId(dept.id)}
                   className="text-slate-400 hover:text-rose-500"
                 >
                   <svg
@@ -137,6 +145,14 @@ export default function DepartmentsPage() {
           </div>
         )}
       </section>
+
+      <ConfirmDialog
+        isOpen={deletingId !== null}
+        message={t("departments.delete.confirm")}
+        onConfirm={confirmDelete}
+        onCancel={() => setDeletingId(null)}
+        isDestructive
+      />
     </div>
   );
 }

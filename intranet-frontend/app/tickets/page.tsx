@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState, type FormEvent } from "react";
 import type { Ticket, Department, Employee } from "@/lib/api";
 import { createTicket, deleteTicket, getTickets, getDepartments, getEmployees, updateTicketStatus, assignTicket } from "@/lib/api";
 import { useLanguage } from "@/components/i18n";
+import ConfirmDialog from "@/components/ConfirmDialog";
 
 const allValue = "ALL";
 
@@ -53,6 +54,9 @@ export default function TicketsPage() {
     description: "",
     department: "", // ID as string
   });
+  
+  // Confirmation state
+  const [deletingId, setDeletingId] = useState<number | null>(null);
 
   const statusLabels: Record<string, string> = useMemo(() => ({
     open: t("tickets.status.open"),
@@ -107,13 +111,21 @@ export default function TicketsPage() {
   };
 
   const handleDelete = (id: number) => {
-      if (!confirm(t("common.confirm"))) return;
-      deleteTicket(id).then(() => {
-          setTickets(prev => prev.filter(t => t.id !== id));
-      }).catch(err => {
+      setDeletingId(id);
+  };
+
+  const confirmDelete = () => {
+      if (deletingId === null) return;
+      deleteTicket(deletingId)
+        .then(() => {
+          setTickets((prev) => prev.filter((t) => t.id !== deletingId));
+          setDeletingId(null);
+        })
+        .catch((err) => {
           alert(t("tickets.delete.error"));
           console.error(err);
-      });
+          setDeletingId(null);
+        });
   };
 
   const handleAssign = (id: number, assigneeId: string) => {
@@ -308,6 +320,14 @@ export default function TicketsPage() {
           </div>
         )}
       </section>
+
+      <ConfirmDialog
+        isOpen={deletingId !== null}
+        message={t("common.confirm")}
+        onConfirm={confirmDelete}
+        onCancel={() => setDeletingId(null)}
+        isDestructive
+      />
     </div>
   );
 }

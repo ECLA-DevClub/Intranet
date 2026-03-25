@@ -48,6 +48,7 @@ export interface Employee {
   id: number;
   name: string;
   email: string;
+  password?: string;
   position: string;
   department: string; // Just a string in backend model
   role: string;
@@ -84,13 +85,20 @@ export async function authFetch(
   const access = getAccessToken();
 
   const doFetch = async (token: string | null) => {
+    const headersRaw = new Headers(init?.headers);
+    if (token) {
+      headersRaw.set("Authorization", `Bearer ${token}`);
+    }
+
+    const headers: Record<string, string> = {};
+    headersRaw.forEach((value, key) => {
+      headers[key] = value;
+    });
+
     return fetch(buildUrl(path), {
       ...init,
       credentials: "omit", // or "include" if using cookies
-      headers: {
-        ...(init?.headers ?? {}),
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
+      headers,
     });
   };
 
@@ -251,22 +259,24 @@ export async function createTicket(data: { title: string; description: string; d
   return response.json();
 }
 
-export async function updateTicketStatus(id: number, status: "in_progress" | "closed"): Promise<void> {
+export async function updateTicketStatus(id: number, status: "in_progress" | "closed"): Promise<Ticket> {
     const response = await authFetch(`/api/tickets/${id}/change-status/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status }),
     });
     if (!response.ok) throw new Error("Failed to update status");
+    return response.json();
 }
 
-export async function assignTicket(id: number, assigneeId: number): Promise<void> {
+export async function assignTicket(id: number, assigneeId: number): Promise<Ticket> {
     const response = await authFetch(`/api/tickets/${id}/assign/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ assignee: assigneeId }),
     });
     if (!response.ok) throw new Error("Failed to assign ticket");
+    return response.json();
 }
 
 export async function deleteTicket(id: number): Promise<void> {

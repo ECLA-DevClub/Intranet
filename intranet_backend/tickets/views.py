@@ -1,8 +1,10 @@
 from rest_framework import viewsets, filters, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+from django.db.models import Q
 from documents.permissions import IsAssignedToDepartment
-from .permissions import IsTicketAssignee
+from .permissions import IsTicketAssignee, IsTicketParticipant
 from .models import Ticket
 from .serializers import TicketSerializer, StatusChangeSerializer, AssignTicketSerializer
 from audit.models import AuditLog
@@ -14,7 +16,20 @@ class TicketViewSet(viewsets.ModelViewSet):
     Extra actions: change_status, assign.
     """
     serializer_class = TicketSerializer
-    permission_classes = [IsAssignedToDepartment]
+    
+    def get_permissions(self):
+        # Create and List are open to authenticated users
+        # (List is filtered by get_queryset)
+        if self.action in ("list", "create"):
+            return [IsAuthenticated()]
+            
+        # Assign is restricted to department members (managers/admins/employees of that dept)
+        if self.action == "assign":
+            return [IsAssignedToDepartment()]
+            
+        # Retrieve, Update, Destroy: Creator, Assignee, or Department Member
+        return [IsTicketParticipant()]
+
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['title', 'description']
     ordering_fields = ['created_at', 'title', 'status']
@@ -26,10 +41,16 @@ class TicketViewSet(viewsets.ModelViewSet):
         if user.is_superuser or user.role == 'admin':
             return base_qs
 
-        if hasattr(user, 'department') and user.department:
-            return base_qs.filter(department=user.department)
+        # Allow access to tickets:
+        # 1. In the user's department
+        # 2. Created by the user
+        # 3. Assigned to the user
+        filters = Q(created_by=user) | Q(assignee=user)
 
-        return base_qs.none()
+        if hasattr(user, 'department') and user.department:
+            filters |= Q(department=user.department)
+
+        return base_qs.filter(filters).distinct()
 
     # ── Audit helpers ─────────────────────────────────────
 

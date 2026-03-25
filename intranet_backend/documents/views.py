@@ -1,9 +1,11 @@
 from rest_framework import viewsets, filters, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+from django.db.models import Q
 from .models import Document, DocumentVersion
 from .serializers import DocumentSerializer, DocumentVersionSerializer, UploadVersionSerializer
-from .permissions import IsAssignedToDepartment
+from .permissions import IsAssignedToDepartment, IsDocumentParticipant
 from audit.models import AuditLog
 
 
@@ -13,7 +15,12 @@ class DocumentViewSet(viewsets.ModelViewSet):
     Extra actions: upload_version, versions.
     """
     serializer_class = DocumentSerializer
-    permission_classes = [IsAssignedToDepartment]
+    
+    def get_permissions(self):
+        if self.action in ("list", "create"):
+            return [IsAuthenticated()]
+        return [IsDocumentParticipant()]
+
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['title']
     ordering_fields = ['created_at', 'title']
@@ -25,10 +32,15 @@ class DocumentViewSet(viewsets.ModelViewSet):
         if user.is_superuser or user.role == 'admin':
             return base_qs
 
+        # Allow access if:
+        # 1. User is the author
+        # 2. Document is in user's department
+        filters = Q(author=user)
+        
         if hasattr(user, 'department') and user.department:
-            return base_qs.filter(department=user.department)
+            filters |= Q(department=user.department)
 
-        return base_qs.none()
+        return base_qs.filter(filters).distinct()
 
     # ── Audit helper ──────────────────────────────────────
 

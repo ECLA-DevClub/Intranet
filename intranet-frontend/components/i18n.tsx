@@ -157,6 +157,8 @@ const dictionary: Record<Language, Record<string, string>> = {
     "toggle.current": "Current language",
 
     // Common
+    "common.password": "Password",
+    "common.password.placeholder": "Enter password",
     "common.select.department": "Select Department",
     "common.select.role": "Select Role",
     "common.confirm": "Are you sure?",
@@ -333,6 +335,8 @@ const dictionary: Record<Language, Record<string, string>> = {
     "toggle.current": "Текущий язык",
 
     // Common
+    "common.password": "Пароль",
+    "common.password.placeholder": "Введите пароль",
     "common.select.department": "Выберите департамент",
     "common.select.role": "Выберите роль",
     "common.confirm": "Вы уверены?",
@@ -398,7 +402,8 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     if ((stored === "ru" || stored === "en") && stored !== lang) {
       setLang(stored); // eslint-disable-line react-hooks/set-state-in-effect
     }
-  }, [lang]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     document.documentElement.lang = lang;

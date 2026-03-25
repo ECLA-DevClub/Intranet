@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState, type FormEvent } from "react";
 import type { DocumentItem, Department } from "@/lib/api";
 import { createDocument, deleteDocument, getDocuments, getDepartments } from "@/lib/api";
 import { useLanguage } from "@/components/i18n";
+import ConfirmDialog from "@/components/ConfirmDialog";
 
 const allValue = "ALL";
 
@@ -44,6 +45,9 @@ export default function DocumentsPage() {
   const [title, setTitle] = useState("");
   const [selectedDept, setSelectedDept] = useState(""); // Stores ID
   const [file, setFile] = useState<File | null>(null);
+  
+  // Confirmation state
+  const [deletingId, setDeletingId] = useState<number | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -91,13 +95,21 @@ export default function DocumentsPage() {
   };
 
   const handleDelete = (id: number) => {
-      if (!confirm(t("documents.delete.confirm"))) return;
-      deleteDocument(id).then(() => {
-          setDocuments(prev => prev.filter(d => d.id !== id));
-      }).catch(err => {
-          alert(t("documents.delete.error"));
-          console.error(err);
-      });
+      setDeletingId(id);
+  };
+
+  const confirmDelete = () => {
+      if (deletingId === null) return;
+      deleteDocument(deletingId)
+        .then(() => {
+            setDocuments(prev => prev.filter(d => d.id !== deletingId));
+            setDeletingId(null);
+        })
+        .catch(err => {
+            alert(t("documents.delete.error"));
+            console.error(err);
+            setDeletingId(null);
+        });
   };
 
   // Helper to get department name from ID
@@ -250,6 +262,14 @@ export default function DocumentsPage() {
           </div>
         )}
       </section>
+
+      <ConfirmDialog
+        isOpen={deletingId !== null}
+        message={t("documents.delete.confirm")}
+        onConfirm={confirmDelete}
+        onCancel={() => setDeletingId(null)}
+        isDestructive
+      />
     </div>
   );
 }

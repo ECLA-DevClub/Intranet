@@ -26,6 +26,6 @@ class DepartmentViewSet(viewsets.ModelViewSet):
     ordering = ["name"]
 
     def get_permissions(self):
-        if self.action in ("list", "retrieve"):
+        if self.action in ("list", "retrieve", "create", "destroy", "update", "partial_update"):
             return [IsAuthenticated()]
         return [IsManagerOrAdmin()]

@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState, type FormEvent } from "react";
 import type { Employee, Department } from "@/lib/api";
 import { createEmployee, deleteEmployee, getEmployees, getDepartments } from "@/lib/api";
 import { useLanguage } from "@/components/i18n";
+import ConfirmDialog from "@/components/ConfirmDialog";
 
 const allValue = "ALL";
 
@@ -48,7 +49,12 @@ export default function EmployeesPage() {
     position: "",
     department: "", // This will store the NAME string, not ID
     role: "",
+    password: "",
   });
+  
+  // Confirmation state
+  const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -95,6 +101,7 @@ export default function EmployeesPage() {
       position: form.position.trim(),
       department: form.department.trim(), // Name string
       role: form.role.trim(),
+      password: form.password.trim(),
     };
 
     if (!trimmed.name || !trimmed.department || !trimmed.email) {
@@ -110,7 +117,9 @@ export default function EmployeesPage() {
           position: "",
           department: "",
           role: "",
+          password: "",
         });
+        setSuccessMessage(`Employee created successfully!\n${trimmed.password ? 'Password: ' + trimmed.password : 'Default password: password123'}\nUsername: ${trimmed.email.split('@')[0]}`);
       })
       .catch((err) => {
         alert(t("employees.create.error"));
@@ -119,13 +128,20 @@ export default function EmployeesPage() {
   };
 
   const handleDelete = (id: number) => {
-      deleteEmployee(id)
+      setDeletingId(id);
+  };
+
+  const confirmDelete = () => {
+      if (deletingId === null) return;
+      deleteEmployee(deletingId)
         .then(() => {
-          setEmployees((prev) => prev.filter((item) => item.id !== id));
+          setEmployees((prev) => prev.filter((item) => item.id !== deletingId));
+          setDeletingId(null);
         })
         .catch((err) => {
           alert(t("employees.delete.error"));
           console.error(err);
+          setDeletingId(null);
         });
   };
 
@@ -195,6 +211,17 @@ export default function EmployeesPage() {
           </div>
           <div className="space-y-2">
             <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+              {t("common.password")}
+            </label>
+            <input
+              value={form.password}
+              onChange={(event) => setForm({ ...form, password: event.target.value })}
+              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700 focus:border-slate-400 focus:outline-none"
+              placeholder={t("common.password.placeholder") || "Password (optional)"}
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
               {t("employees.form.department")}
             </label>
             <select
@@ -204,7 +231,7 @@ export default function EmployeesPage() {
               required
             >
                 <option value="">{t("common.select.department")}</option>
-                {departments.map(d => (
+                {departments.map((d) => (
                     <option key={d.id} value={d.name}>{d.name}</option> 
                 ))}
             </select>
@@ -315,10 +342,24 @@ export default function EmployeesPage() {
         ))}
         {filtered.length === 0 && (
           <div className="col-span-full py-10 text-center text-sm text-slate-500">
-            {t("employees.empty")}
-          </div>
+              <ConfirmDialog
+        isOpen={!!successMessage}
+        message={successMessage || ""}
+        onConfirm={() => setSuccessMessage(null)}
+        onCancel={() => setSuccessMessage(null)}
+        showCancel={false}
+        confirmLabel="OK"
+      />          </div>
         )}
       </section>
+
+      <ConfirmDialog
+        isOpen={deletingId !== null}
+        message={t("employees.delete.confirm")}
+        onConfirm={confirmDelete}
+        onCancel={() => setDeletingId(null)}
+        isDestructive
+      />
     </div>
   );
 }
