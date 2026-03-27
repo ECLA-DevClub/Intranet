@@ -1,7 +1,7 @@
 from rest_framework import viewsets, filters
 from rest_framework.permissions import IsAuthenticated
 
-from accounts.permissions import IsManagerOrAdmin
+from accounts.permissions import IsAdmin
 from departments.models import Department
 from departments.serializers import DepartmentSerializer
 
@@ -26,6 +26,6 @@ class DepartmentViewSet(viewsets.ModelViewSet):
     ordering = ["name"]
 
     def get_permissions(self):
-        if self.action in ("list", "retrieve", "create", "destroy", "update", "partial_update"):
+        if self.action in ("list", "retrieve"):
             return [IsAuthenticated()]
-        return [IsManagerOrAdmin()]
+        return [IsAdmin()]

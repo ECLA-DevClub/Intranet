@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { getAccessToken, getStoredUser, logoutLocal } from "@/lib/auth";
+import { getAccessToken, logoutLocal } from "@/lib/auth";
 import { fetchMe } from "@/lib/api";
 import AppHeader from "@/components/AppHeader";
 
@@ -41,14 +41,7 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      // Case 3: Token exists, on protected page. Check user data.
-      const existingUser = getStoredUser();
-      if (existingUser) {
-        if (active) setReady(true);
-        return;
-      }
-
-      // Fetch user profile if missing
+      // Case 3: Token exists, on protected page. Validate token/profile.
       try {
         await fetchMe();
         if (active) setReady(true);

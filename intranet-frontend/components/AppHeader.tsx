@@ -2,14 +2,22 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import LanguageToggle from "@/components/LanguageToggle";
 import ThemeToggle from "@/components/ThemeToggle";
 import { useLanguage } from "@/components/i18n";
+import { logoutLocal } from "@/lib/auth";
 
 export default function AppHeader() {
   const { t } = useLanguage();
+  const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
+
+  const handleLogout = () => {
+    logoutLocal();
+    router.push("/login"); // redirect to login page
+  };
 
   const toggleMenu = () => {
     if (isMenuOpen) {
@@ -62,6 +70,13 @@ export default function AppHeader() {
           <div className="flex items-center gap-2 border-l border-slate-200 pl-3 ml-2">
             <ThemeToggle />
             <LanguageToggle />
+            <button
+              onClick={handleLogout}
+              className="rounded-lg bg-red-50 p-2 text-red-600 hover:bg-red-100 transition-colors"
+              title={t("nav.logout")}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
+            </button>
           </div>
         </nav>
 
@@ -97,6 +112,15 @@ export default function AppHeader() {
             >
               {t("nav.employees")}
             </Link>
+            <button
+              onClick={() => {
+                closeMenu();
+                handleLogout();
+              }}
+              className="flex items-center rounded-lg p-2 text-red-600 hover:bg-red-50 w-full text-left"
+            >
+              {t("nav.logout")}
+            </button>
             <Link 
               href="/tickets" 
               className="flex items-center rounded-lg p-2 hover:bg-slate-50"

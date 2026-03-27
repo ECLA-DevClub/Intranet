@@ -18,11 +18,16 @@ def setup_admin():
             print(f"Пользователь '{username}' найден. Сбрасываем пароль...")
             user = User.objects.get(username=username)
             user.set_password(password)
+            user.role = User.Role.ADMIN
+            user.is_staff = True
+            user.is_superuser = True
             user.save()
             print(f"УСПЕХ: Пароль для '{username}' изменен на '{password}'")
         else:
             print(f"Пользователь '{username}' не найден. Создаем нового...")
-            User.objects.create_superuser(username, email, password)
+            user = User.objects.create_superuser(username, email, password)
+            user.role = User.Role.ADMIN
+            user.save(update_fields=['role'])
             print(f"УСПЕХ: Суперпользователь '{username}' создан с паролем '{password}'")
     except Exception as e:
         print(f"ОШИБКА: {e}")

@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import type { Ticket, Department, Employee } from "@/lib/api";
 import { createTicket, deleteTicket, getTickets, getDepartments, getEmployees, updateTicketStatus, assignTicket } from "@/lib/api";
+import { getStoredUser } from "@/lib/auth";
 import { useLanguage } from "@/components/i18n";
 import ConfirmDialog from "@/components/ConfirmDialog";
 
@@ -44,6 +45,7 @@ function FilterPill({
 
 export default function TicketsPage() {
   const { t } = useLanguage();
+  const [userRole, setUserRole] = useState<"admin" | "manager" | "employee" | null>(null);
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [departments, setDepartments] = useState<Department[]>([]);
   const [employees, setEmployees] = useState<Employee[]>([]);
@@ -58,6 +60,9 @@ export default function TicketsPage() {
   // Confirmation state
   const [deletingId, setDeletingId] = useState<number | null>(null);
 
+  const canManageTickets = userRole === "admin" || userRole === "manager";
+  const canAssignTickets = canManageTickets;
+
   const statusLabels: Record<string, string> = useMemo(() => ({
     open: t("tickets.status.open"),
     in_progress: t("tickets.status.progress"),
@@ -65,6 +70,9 @@ export default function TicketsPage() {
   }), [t]);
 
   useEffect(() => {
+    const user = getStoredUser();
+    setUserRole(user?.role ?? null);
+
     let active = true;
     Promise.all([getTickets(), getDepartments(), getEmployees()]).then(([ticketsData, deptsData, empsData]) => {
       if (active) {
@@ -72,7 +80,7 @@ export default function TicketsPage() {
         setDepartments(deptsData);
         setEmployees(empsData);
       }
-    }).catch(console.error);
+    }).catch(console.warn);
     return () => {
       active = false;
     };
@@ -97,7 +105,7 @@ export default function TicketsPage() {
         setForm({ title: "", description: "", department: "" });
     }).catch(err => {
         alert(t("tickets.create.error"));
-        console.error(err);
+      console.warn(err);
     });
   };
 
@@ -106,7 +114,7 @@ export default function TicketsPage() {
           setTickets(prev => prev.map(t => t.id === id ? updated : t));
       }).catch(err => {
           alert(t("tickets.update.error"));
-          console.error(err);
+          console.warn(err);
       });
   };
 
@@ -123,7 +131,7 @@ export default function TicketsPage() {
         })
         .catch((err) => {
           alert(t("tickets.delete.error"));
-          console.error(err);
+          console.warn(err);
           setDeletingId(null);
         });
   };
@@ -139,7 +147,7 @@ export default function TicketsPage() {
       })
       .catch((err) => {
         alert(t("tickets.assign.error"));
-        console.error(err);
+        console.warn(err);
       });
   };
   
@@ -165,6 +173,7 @@ export default function TicketsPage() {
       </header>
 
       {/* New Ticket Form */}
+      {canManageTickets && (
       <section className="animated-border rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
         <h2 className="text-sm font-semibold text-slate-900 mb-4">{t("tickets.new.title")}</h2>
         <form onSubmit={handleAdd} className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -219,6 +228,7 @@ export default function TicketsPage() {
           </div>
         </form>
       </section>
+      )}
 
       {/* Filter */}
       <section className="flex flex-wrap gap-2">
@@ -249,6 +259,7 @@ export default function TicketsPage() {
                 <span className={`inline-flex items-center rounded-lg px-2.5 py-0.5 text-xs font-medium border ${statusStyles[ticket.status]}`}>
                    {statusLabels[ticket.status] ?? ticket.status}
                 </span>
+                {canManageTickets && (
                 <button 
                   onClick={() => handleDelete(ticket.id)}
                   className="text-slate-400 hover:text-rose-500"
@@ -258,6 +269,7 @@ export default function TicketsPage() {
                       <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
                    </svg>
                 </button>
+                )}
               </div>
               <h3 className="mt-3 font-semibold text-slate-900">{ticket.title}</h3>
               <p className="mt-1 text-sm text-slate-500 line-clamp-2">{ticket.description}</p>
@@ -274,10 +286,11 @@ export default function TicketsPage() {
                       value={ticket.assignee || ""}
                       onChange={(e) => handleAssign(ticket.id, e.target.value)}
                       onClick={(e) => e.stopPropagation()}
+                      disabled={!canAssignTickets}
                     >
                       <option value="">{t("common.unassigned")}</option>
-                      {employees.map((emp) => (
-                        <option key={emp.id} value={emp.id}>
+                      {employees.filter((emp) => !!emp.user_id).map((emp) => (
+                        <option key={emp.id} value={emp.user_id ?? ""}>
                           {emp.name}
                         </option>
                       ))}

@@ -3,11 +3,13 @@
 import { useEffect, useState, type FormEvent } from "react";
 import type { Department } from "@/lib/api";
 import { createDepartment, deleteDepartment, getDepartments } from "@/lib/api";
+import { getStoredUser } from "@/lib/auth";
 import { useLanguage } from "@/components/i18n";
 import ConfirmDialog from "@/components/ConfirmDialog";
 
 export default function DepartmentsPage() {
   const { t } = useLanguage();
+  const [userRole, setUserRole] = useState<"admin" | "manager" | "employee" | null>(null);
   const [departments, setDepartments] = useState<Department[]>([]);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -15,8 +17,12 @@ export default function DepartmentsPage() {
   // Confirmation state
   const [deletingId, setDeletingId] = useState<number | null>(null);
 
+  const canManageDepartments = userRole === "admin";
+
   useEffect(() => {
-    getDepartments().then(setDepartments).catch(console.error);
+    const user = getStoredUser();
+    setUserRole(user?.role ?? null);
+    getDepartments().then(setDepartments).catch(console.warn);
   }, []);
 
   const handleCreate = (e: FormEvent) => {
@@ -31,7 +37,7 @@ export default function DepartmentsPage() {
       })
       .catch((err) => {
         alert(t("departments.create.error"));
-        console.error(err);
+        console.warn(err);
       });
   };
 
@@ -44,7 +50,7 @@ export default function DepartmentsPage() {
       })
       .catch((err) => {
         alert(t("departments.delete.error"));
-        console.error(err);
+        console.warn(err);
       })
       .finally(() => {
         setDeletingId(null);
@@ -65,6 +71,7 @@ export default function DepartmentsPage() {
         </p>
       </header>
 
+      {canManageDepartments && (
       <section className="animated-border rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
         <h2 className="mb-4 text-sm font-semibold text-slate-900">
           {t("departments.new.title")}
@@ -103,6 +110,7 @@ export default function DepartmentsPage() {
           </div>
         </form>
       </section>
+      )}
 
       <section className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {departments.map((dept) => (
@@ -113,6 +121,7 @@ export default function DepartmentsPage() {
             <div>
               <div className="flex items-start justify-between">
                 <h3 className="font-semibold text-slate-900">{dept.name}</h3>
+                {canManageDepartments && (
                 <button
                   onClick={() => setDeletingId(dept.id)}
                   className="text-slate-400 hover:text-rose-500"
@@ -132,6 +141,7 @@ export default function DepartmentsPage() {
                     />
                   </svg>
                 </button>
+                )}
               </div>
               {dept.description && (
                 <p className="mt-2 text-sm text-slate-500">{dept.description}</p>

@@ -2,7 +2,8 @@
 
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import type { Employee, Department } from "@/lib/api";
-import { createEmployee, deleteEmployee, getEmployees, getDepartments } from "@/lib/api";
+import { createEmployee, deleteEmployee, getEmployees, getDepartments, updateEmployeeRole } from "@/lib/api";
+import { getStoredUser } from "@/lib/auth";
 import { useLanguage } from "@/components/i18n";
 import ConfirmDialog from "@/components/ConfirmDialog";
 
@@ -35,17 +36,19 @@ function FilterPill({
 
 export default function EmployeesPage() {
   const { t } = useLanguage();
+  const [userRole, setUserRole] = useState<"admin" | "manager" | "employee" | null>(null);
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [departments, setDepartments] = useState<Department[]>([]);
   
   // Filter states
   const [department, setDepartment] = useState(allValue);
-  const [role, setRole] = useState(allValue);
+  const [roleFilter, setRoleFilter] = useState(allValue);
   
   // Form state
   const [form, setForm] = useState({
     name: "",
     email: "",
+    username: "",
     position: "",
     department: "", // This will store the NAME string, not ID
     role: "",
@@ -55,6 +58,15 @@ export default function EmployeesPage() {
   // Confirmation state
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  const canManageEmployees = userRole === "admin" || userRole === "manager";
+  const canCreateManager = userRole === "admin";
+  const canAssignAdmins = userRole === "admin";
+
+  useEffect(() => {
+    const user = getStoredUser();
+    setUserRole(user?.role ?? null);
+  }, []);
 
   useEffect(() => {
     let active = true;
@@ -88,16 +100,17 @@ export default function EmployeesPage() {
   const filtered = useMemo(() => {
     return employees.filter((item) => {
       const departmentOk = department === allValue || item.department === department;
-      const roleOk = role === allValue || item.role === role;
+      const roleOk = roleFilter === allValue || item.role === roleFilter;
       return departmentOk && roleOk;
     });
-  }, [employees, department, role]);
+  }, [employees, department, roleFilter]);
 
   const handleAdd = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const trimmed = {
       name: form.name.trim(),
       email: form.email.trim(),
+      username: form.username.trim(),
       position: form.position.trim(),
       department: form.department.trim(), // Name string
       role: form.role.trim(),
@@ -114,21 +127,35 @@ export default function EmployeesPage() {
         setForm({
           name: "",
           email: "",
+          username: "",
           position: "",
           department: "",
           role: "",
           password: "",
         });
-        setSuccessMessage(`Employee created successfully!\n${trimmed.password ? 'Password: ' + trimmed.password : 'Default password: password123'}\nUsername: ${trimmed.email.split('@')[0]}`);
+        setSuccessMessage(`Employee created successfully!\n${trimmed.password ? 'Password: ' + trimmed.password : 'Default password: password123'}\nLogin: ${trimmed.username || trimmed.email}`);
       })
       .catch((err) => {
-        alert(t("employees.create.error"));
-        console.error(err);
+        const message = err instanceof Error && err.message ? err.message : t("employees.create.error");
+        alert(message);
+        console.warn(err);
       });
   };
 
   const handleDelete = (id: number) => {
       setDeletingId(id);
+  };
+
+  const handleRoleAssign = (id: number, newRole: "admin" | "manager" | "employee") => {
+    updateEmployeeRole(id, newRole)
+      .then((updated) => {
+        setEmployees((prev) => prev.map((item) => (item.id === id ? updated : item)));
+      })
+      .catch((err) => {
+        const message = err instanceof Error && err.message ? err.message : t("employees.update.error");
+        alert(message);
+        console.warn(err);
+      });
   };
 
   const confirmDelete = () => {
@@ -140,7 +167,7 @@ export default function EmployeesPage() {
         })
         .catch((err) => {
           alert(t("employees.delete.error"));
-          console.error(err);
+          console.warn(err);
           setDeletingId(null);
         });
   };
@@ -164,6 +191,7 @@ export default function EmployeesPage() {
         </div>
       </header>
 
+      {canManageEmployees && (
       <section className="animated-border rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div>
@@ -207,6 +235,17 @@ export default function EmployeesPage() {
               className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700 focus:border-slate-400 focus:outline-none"
               placeholder={t("employees.form.email.placeholder")}
               required
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+              {t("employees.form.login")}
+            </label>
+            <input
+              value={form.username}
+              onChange={(event) => setForm({ ...form, username: event.target.value })}
+              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700 focus:border-slate-400 focus:outline-none"
+              placeholder={t("employees.form.login.placeholder")}
             />
           </div>
           <div className="space-y-2">
@@ -260,12 +299,13 @@ export default function EmployeesPage() {
             >
                 <option value="">{t("common.select.role")}</option>
                 <option value="employee">{t("roles.employee")}</option>
-                <option value="manager">{t("roles.manager")}</option>
-                <option value="admin">{t("roles.admin")}</option>
+                {canCreateManager && <option value="manager">{t("roles.manager")}</option>}
+                {canAssignAdmins && <option value="admin">{t("roles.admin")}</option>}
             </select>
           </div>
         </form>
       </section>
+      )}
 
       <section className="animated-border grid gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm md:grid-cols-2">
         <div className="space-y-3">
@@ -292,8 +332,8 @@ export default function EmployeesPage() {
               <FilterPill
                 key={value}
                 label={value === allValue ? t("common.all") : value}
-                active={role === value}
-                onClick={() => setRole(value)}
+                active={roleFilter === value}
+                onClick={() => setRoleFilter(value)}
               />
             ))}
           </div>
@@ -312,6 +352,7 @@ export default function EmployeesPage() {
                   <h3 className="font-semibold text-slate-900">{item.name}</h3>
                   <p className="text-sm text-slate-500">{item.position}</p>
                 </div>
+                {canManageEmployees && (
                  <button
                   type="button"
                   onClick={() => handleDelete(item.id)}
@@ -322,6 +363,7 @@ export default function EmployeesPage() {
                     <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
                   </svg>
                 </button>
+                )}
               </div>
               <div className="mt-4 grid gap-2">
                 <div className="flex items-center gap-2 text-sm text-slate-600">
@@ -332,9 +374,25 @@ export default function EmployeesPage() {
                   <span className="font-medium text-slate-400 uppercase tracking-wider text-[10px]">{t("employees.form.email")}</span>
                   {item.email}
                 </div>
+                <div className="flex items-center gap-2 text-sm text-slate-600">
+                  <span className="font-medium text-slate-400 uppercase tracking-wider text-[10px]">{t("employees.form.login")}</span>
+                  {item.username || item.email}
+                </div>
                  <div className="flex items-center gap-2 text-sm text-slate-600">
                   <span className="font-medium text-slate-400 uppercase tracking-wider text-[10px]">{t("employees.table.role")}</span>
-                  {item.role}
+                  {canAssignAdmins ? (
+                    <select
+                      value={item.role}
+                      onChange={(event) => handleRoleAssign(item.id, event.target.value as "admin" | "manager" | "employee")}
+                      className="rounded border border-slate-200 bg-white px-2 py-1 text-xs text-slate-700 focus:border-slate-400 focus:outline-none"
+                    >
+                      <option value="employee">{t("roles.employee")}</option>
+                      <option value="manager">{t("roles.manager")}</option>
+                      <option value="admin">{t("roles.admin")}</option>
+                    </select>
+                  ) : (
+                    item.role
+                  )}
                 </div>
               </div>
             </div>
@@ -342,16 +400,19 @@ export default function EmployeesPage() {
         ))}
         {filtered.length === 0 && (
           <div className="col-span-full py-10 text-center text-sm text-slate-500">
-              <ConfirmDialog
+            {t("employees.empty")}
+          </div>
+        )}
+      </section>
+
+      <ConfirmDialog
         isOpen={!!successMessage}
         message={successMessage || ""}
         onConfirm={() => setSuccessMessage(null)}
         onCancel={() => setSuccessMessage(null)}
         showCancel={false}
         confirmLabel="OK"
-      />          </div>
-        )}
-      </section>
+      />
 
       <ConfirmDialog
         isOpen={deletingId !== null}

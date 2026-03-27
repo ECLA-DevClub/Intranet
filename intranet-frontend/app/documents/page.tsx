@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import type { DocumentItem, Department } from "@/lib/api";
 import { createDocument, deleteDocument, getDocuments, getDepartments } from "@/lib/api";
+import { getStoredUser } from "@/lib/auth";
 import { useLanguage } from "@/components/i18n";
 import ConfirmDialog from "@/components/ConfirmDialog";
 
@@ -35,6 +36,7 @@ function FilterPill({
 
 export default function DocumentsPage() {
   const { t } = useLanguage();
+  const [userRole, setUserRole] = useState<"admin" | "manager" | "employee" | null>(null);
   const [documents, setDocuments] = useState<DocumentItem[]>([]);
   const [departments, setDepartments] = useState<Department[]>([]);
   
@@ -49,14 +51,19 @@ export default function DocumentsPage() {
   // Confirmation state
   const [deletingId, setDeletingId] = useState<number | null>(null);
 
+  const canManageDocuments = userRole === "admin" || userRole === "manager";
+
   useEffect(() => {
+    const user = getStoredUser();
+    setUserRole(user?.role ?? null);
+
     let active = true;
     Promise.all([getDocuments(), getDepartments()]).then(([docsData, deptsData]) => {
       if (active) {
         setDocuments(docsData);
         setDepartments(deptsData);
       }
-    }).catch(console.error);
+    }).catch(console.warn);
     return () => {
       active = false;
     };
@@ -90,7 +97,7 @@ export default function DocumentsPage() {
           if (fileInput) fileInput.value = '';
       }).catch(err => {
           alert(t("documents.upload.error"));
-          console.error(err);
+          console.warn(err);
       });
   };
 
@@ -107,7 +114,7 @@ export default function DocumentsPage() {
         })
         .catch(err => {
             alert(t("documents.delete.error"));
-            console.error(err);
+          console.warn(err);
             setDeletingId(null);
         });
   };
@@ -134,6 +141,7 @@ export default function DocumentsPage() {
       </header>
 
       {/* Upload Form */}
+      {canManageDocuments && (
       <section className="animated-border rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
          <h2 className="text-sm font-semibold text-slate-900 mb-4">{t("documents.new.title")}</h2>
          <form onSubmit={handleCreate} className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -181,6 +189,7 @@ export default function DocumentsPage() {
              </div>
          </form>
       </section>
+      )}
 
       {/* Filters */}
       <section className="flex flex-wrap gap-2">
@@ -217,6 +226,7 @@ export default function DocumentsPage() {
                    </div>
                    <h3 className="mt-4 font-semibold text-slate-900 break-words">{item.title}</h3>
                 </div>
+                {canManageDocuments && (
                 <button
                   onClick={() => handleDelete(item.id)}
                   className="text-slate-400 hover:text-rose-500"
@@ -226,6 +236,7 @@ export default function DocumentsPage() {
                       <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
                    </svg>
                 </button>
+                )}
               </div>
               
               <div className="mt-4 flex flex-col gap-1 text-xs text-slate-500">

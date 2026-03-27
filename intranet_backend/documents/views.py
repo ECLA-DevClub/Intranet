@@ -3,6 +3,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.db.models import Q
+from accounts.permissions import IsManagerOrAdmin
 from .models import Document, DocumentVersion
 from .serializers import DocumentSerializer, DocumentVersionSerializer, UploadVersionSerializer
 from .permissions import IsAssignedToDepartment, IsDocumentParticipant
@@ -17,8 +18,10 @@ class DocumentViewSet(viewsets.ModelViewSet):
     serializer_class = DocumentSerializer
     
     def get_permissions(self):
-        if self.action in ("list", "create"):
+        if self.action in ("list", "retrieve"):
             return [IsAuthenticated()]
+        if self.action in ("create", "update", "partial_update", "destroy", "upload_version"):
+            return [IsManagerOrAdmin()]
         return [IsDocumentParticipant()]
 
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]

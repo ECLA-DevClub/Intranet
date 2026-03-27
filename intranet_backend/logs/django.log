@@ -510,3 +510,493 @@ INFO 2026-03-25 14:06:14,236 autoreload 11252 17136 C:\Users\DAUD.TUFGAMING\Intr
 INFO 2026-03-25 14:06:15,585 autoreload 31972 16108 Watching for file changes with StatReloader
 INFO 2026-03-25 14:06:35,147 autoreload 31972 16108 C:\Users\DAUD.TUFGAMING\Intranet\intranet_backend\employees\views.py changed, reloading.
 INFO 2026-03-25 14:06:36,475 autoreload 23088 30184 Watching for file changes with StatReloader
+INFO 2026-03-25 21:39:23,742 autoreload 11920 26684 Watching for file changes with StatReloader
+INFO 2026-03-25 21:40:40,807 log 11920 29004 "OPTIONS /api/employees/ HTTP/1.1" 200 0
+INFO 2026-03-25 21:40:40,807 log 11920 25520 "OPTIONS /api/departments/ HTTP/1.1" 200 0
+INFO 2026-03-25 21:40:40,807 log 11920 25832 "OPTIONS /api/employees/ HTTP/1.1" 200 0
+INFO 2026-03-25 21:40:40,809 log 11920 29004 "OPTIONS /api/departments/ HTTP/1.1" 200 0
+WARNING 2026-03-25 21:40:40,850 log 11920 20000 "GET /api/departments/ HTTP/1.1" 401 172
+WARNING 2026-03-25 21:40:40,850 log 11920 25520 "GET /api/employees/ HTTP/1.1" 401 172
+INFO 2026-03-25 21:40:40,856 log 11920 25832 "OPTIONS /api/auth/refresh/ HTTP/1.1" 200 0
+WARNING 2026-03-25 21:40:40,856 log 11920 25520 "GET /api/employees/ HTTP/1.1" 401 172
+WARNING 2026-03-25 21:40:40,856 log 11920 20000 "GET /api/departments/ HTTP/1.1" 401 172
+INFO 2026-03-25 21:40:40,856 log 11920 29004 "OPTIONS /api/auth/refresh/ HTTP/1.1" 200 0
+INFO 2026-03-25 21:40:40,876 log 11920 25520 "POST /api/auth/refresh/ HTTP/1.1" 200 587
+INFO 2026-03-25 21:40:40,877 log 11920 20000 "POST /api/auth/refresh/ HTTP/1.1" 200 587
+INFO 2026-03-25 21:40:40,877 log 11920 25832 "POST /api/auth/refresh/ HTTP/1.1" 200 587
+INFO 2026-03-25 21:40:40,878 log 11920 29004 "POST /api/auth/refresh/ HTTP/1.1" 200 587
+INFO 2026-03-25 21:40:40,885 log 11920 25520 "GET /api/employees/ HTTP/1.1" 200 2
+INFO 2026-03-25 21:40:40,891 log 11920 25520 "GET /api/employees/ HTTP/1.1" 200 2
+INFO 2026-03-25 21:40:40,904 log 11920 25832 "GET /api/departments/ HTTP/1.1" 200 133
+INFO 2026-03-25 21:40:40,909 log 11920 25832 "GET /api/departments/ HTTP/1.1" 200 133
+INFO 2026-03-25 21:40:43,316 log 11920 25832 "GET /api/departments/ HTTP/1.1" 200 133
+INFO 2026-03-25 21:40:43,323 log 11920 25832 "GET /api/departments/ HTTP/1.1" 200 133
+INFO 2026-03-25 21:40:50,439 log 11920 25832 "GET /api/employees/ HTTP/1.1" 200 2
+INFO 2026-03-25 21:40:50,444 log 11920 25520 "GET /api/departments/ HTTP/1.1" 200 133
+INFO 2026-03-25 21:40:50,452 log 11920 25832 "GET /api/employees/ HTTP/1.1" 200 2
+INFO 2026-03-25 21:40:50,453 log 11920 25520 "GET /api/departments/ HTTP/1.1" 200 133
+INFO 2026-03-25 21:40:51,896 log 11920 25832 "OPTIONS /api/tickets/ HTTP/1.1" 200 0
+INFO 2026-03-25 21:40:51,896 log 11920 25520 "OPTIONS /api/tickets/ HTTP/1.1" 200 0
+INFO 2026-03-25 21:40:51,904 log 11920 29004 "GET /api/departments/ HTTP/1.1" 200 133
+INFO 2026-03-25 21:40:51,904 log 11920 20000 "GET /api/employees/ HTTP/1.1" 200 2
+INFO 2026-03-25 21:40:51,912 log 11920 25832 "GET /api/tickets/ HTTP/1.1" 200 2
+INFO 2026-03-25 21:40:51,921 log 11920 20000 "GET /api/employees/ HTTP/1.1" 200 2
+INFO 2026-03-25 21:40:51,921 log 11920 29004 "GET /api/departments/ HTTP/1.1" 200 133
+INFO 2026-03-25 21:40:51,922 log 11920 25520 "GET /api/tickets/ HTTP/1.1" 200 2
+INFO 2026-03-25 21:40:52,838 log 11920 25520 "GET /api/departments/ HTTP/1.1" 200 133
+INFO 2026-03-25 21:40:52,843 log 11920 25520 "GET /api/departments/ HTTP/1.1" 200 133
+INFO 2026-03-25 21:40:53,715 log 11920 25520 "GET /api/employees/ HTTP/1.1" 200 2
+INFO 2026-03-25 21:40:53,715 log 11920 20000 "GET /api/departments/ HTTP/1.1" 200 133
+INFO 2026-03-25 21:40:53,725 log 11920 20000 "GET /api/departments/ HTTP/1.1" 200 133
+INFO 2026-03-25 21:40:53,725 log 11920 25520 "GET /api/employees/ HTTP/1.1" 200 2
+INFO 2026-03-25 21:40:56,814 log 11920 20000 "GET /api/departments/ HTTP/1.1" 200 133
+INFO 2026-03-25 21:40:56,819 log 11920 20000 "GET /api/departments/ HTTP/1.1" 200 133
+INFO 2026-03-25 21:52:33,033 autoreload 27660 29028 Watching for file changes with StatReloader
+INFO 2026-03-25 21:52:44,541 log 27660 28980 "GET /api/departments/ HTTP/1.1" 200 133
+INFO 2026-03-25 21:52:44,551 log 27660 28980 "GET /api/departments/ HTTP/1.1" 200 133
+INFO 2026-03-25 21:52:46,435 log 27660 28980 "GET /api/employees/ HTTP/1.1" 200 2
+INFO 2026-03-25 21:52:46,444 log 27660 28980 "GET /api/employees/ HTTP/1.1" 200 2
+INFO 2026-03-25 21:52:46,447 log 27660 2464 "GET /api/departments/ HTTP/1.1" 200 133
+INFO 2026-03-25 21:52:46,453 log 27660 2464 "GET /api/departments/ HTTP/1.1" 200 133
+INFO 2026-03-25 21:52:47,325 log 27660 28980 "GET /api/departments/ HTTP/1.1" 200 133
+INFO 2026-03-25 21:52:47,347 log 27660 30848 "GET /api/employees/ HTTP/1.1" 200 2
+INFO 2026-03-25 21:52:47,347 log 27660 28980 "GET /api/departments/ HTTP/1.1" 200 133
+INFO 2026-03-25 21:52:47,347 log 27660 2464 "GET /api/tickets/ HTTP/1.1" 200 2
+INFO 2026-03-25 21:52:47,362 log 27660 2464 "GET /api/employees/ HTTP/1.1" 200 2
+INFO 2026-03-25 21:52:47,362 log 27660 30848 "GET /api/tickets/ HTTP/1.1" 200 2
+INFO 2026-03-25 21:52:48,193 log 27660 30848 "GET /api/departments/ HTTP/1.1" 200 133
+INFO 2026-03-25 21:52:48,213 log 27660 30848 "GET /api/departments/ HTTP/1.1" 200 133
+INFO 2026-03-25 21:52:51,321 log 27660 30848 "POST /api/departments/ HTTP/1.1" 201 141
+INFO 2026-03-25 21:52:55,173 log 27660 30848 "OPTIONS /api/departments/7/ HTTP/1.1" 200 0
+INFO 2026-03-25 21:52:55,186 log 27660 30848 "DELETE /api/departments/7/ HTTP/1.1" 204 0
+INFO 2026-03-25 21:52:56,880 log 27660 30848 "OPTIONS /api/departments/6/ HTTP/1.1" 200 0
+INFO 2026-03-25 21:52:56,894 log 27660 30848 "DELETE /api/departments/6/ HTTP/1.1" 204 0
+INFO 2026-03-25 21:52:57,925 log 27660 2464 "GET /api/departments/ HTTP/1.1" 200 2
+INFO 2026-03-25 21:52:57,936 log 27660 2464 "GET /api/departments/ HTTP/1.1" 200 2
+INFO 2026-03-25 21:52:57,936 log 27660 30848 "GET /api/employees/ HTTP/1.1" 200 2
+INFO 2026-03-25 21:52:57,944 log 27660 30848 "GET /api/employees/ HTTP/1.1" 200 2
+INFO 2026-03-25 21:53:00,693 log 27660 30848 "GET /api/departments/ HTTP/1.1" 200 2
+INFO 2026-03-25 21:53:00,699 log 27660 30848 "GET /api/departments/ HTTP/1.1" 200 2
+INFO 2026-03-25 21:53:02,943 log 27660 30848 "POST /api/departments/ HTTP/1.1" 201 137
+INFO 2026-03-25 21:53:03,818 log 27660 2464 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-25 21:53:03,820 log 27660 30848 "GET /api/employees/ HTTP/1.1" 200 2
+INFO 2026-03-25 21:53:03,831 log 27660 30848 "GET /api/employees/ HTTP/1.1" 200 2
+INFO 2026-03-25 21:53:03,831 log 27660 2464 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-25 21:54:10,510 log 27660 30848 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-25 21:54:10,516 log 27660 30848 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-25 21:54:13,817 log 27660 30848 "GET /api/employees/ HTTP/1.1" 200 2
+INFO 2026-03-25 21:54:13,827 log 27660 2464 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-25 21:54:13,836 log 27660 30848 "GET /api/employees/ HTTP/1.1" 200 2
+INFO 2026-03-25 21:54:13,841 log 27660 2464 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-25 21:54:17,838 log 27660 2464 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-25 21:54:17,845 log 27660 2464 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-25 21:54:19,152 log 27660 30848 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-25 21:54:19,152 log 27660 2464 "GET /api/employees/ HTTP/1.1" 200 2
+INFO 2026-03-25 21:54:19,166 log 27660 30848 "GET /api/employees/ HTTP/1.1" 200 2
+INFO 2026-03-25 21:54:19,167 log 27660 2464 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-25 21:54:21,897 log 27660 2464 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-25 21:54:21,903 log 27660 2464 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-25 21:54:36,538 log 27660 2464 "GET /api/tickets/ HTTP/1.1" 200 2
+INFO 2026-03-25 21:54:36,542 log 27660 30848 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-25 21:54:36,547 log 27660 28980 "GET /api/employees/ HTTP/1.1" 200 2
+INFO 2026-03-25 21:54:36,550 log 27660 2464 "GET /api/tickets/ HTTP/1.1" 200 2
+INFO 2026-03-25 21:54:36,554 log 27660 30848 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-25 21:54:36,554 log 27660 28980 "GET /api/employees/ HTTP/1.1" 200 2
+INFO 2026-03-25 21:54:54,832 log 27660 28980 "POST /api/tickets/ HTTP/1.1" 201 246
+INFO 2026-03-25 21:55:02,824 log 27660 28980 "GET /api/employees/ HTTP/1.1" 200 2
+INFO 2026-03-25 21:55:02,825 log 27660 30848 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-25 21:55:02,839 log 27660 28980 "GET /api/employees/ HTTP/1.1" 200 2
+INFO 2026-03-25 21:55:02,840 log 27660 30848 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-25 21:55:13,002 log 27660 30848 "POST /api/employees/ HTTP/1.1" 201 126
+INFO 2026-03-25 21:55:14,005 log 27660 28980 "GET /api/employees/ HTTP/1.1" 200 128
+INFO 2026-03-25 21:55:14,005 log 27660 30848 "GET /api/tickets/ HTTP/1.1" 200 248
+INFO 2026-03-25 21:55:14,006 log 27660 2464 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-25 21:55:14,036 log 27660 2464 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-25 21:55:14,037 log 27660 30848 "GET /api/tickets/ HTTP/1.1" 200 248
+INFO 2026-03-25 21:55:14,037 log 27660 28980 "GET /api/employees/ HTTP/1.1" 200 128
+INFO 2026-03-25 21:55:16,499 log 27660 28980 "OPTIONS /api/tickets/2/assign/ HTTP/1.1" 200 0
+WARNING 2026-03-25 21:55:16,506 log 27660 28980 "POST /api/tickets/2/assign/ HTTP/1.1" 400 58
+WARNING 2026-03-25 21:55:25,601 log 27660 28980 "POST /api/tickets/2/assign/ HTTP/1.1" 400 58
+INFO 2026-03-25 21:55:28,474 log 27660 28980 "OPTIONS /api/tickets/2/change-status/ HTTP/1.1" 200 0
+INFO 2026-03-25 21:55:28,491 log 27660 28980 "POST /api/tickets/2/change-status/ HTTP/1.1" 200 253
+INFO 2026-03-25 21:55:35,724 log 27660 28980 "POST /api/tickets/2/change-status/ HTTP/1.1" 200 248
+INFO 2026-03-25 21:55:38,708 log 27660 28980 "OPTIONS /api/tickets/2/ HTTP/1.1" 200 0
+INFO 2026-03-25 21:55:38,730 log 27660 28980 "DELETE /api/tickets/2/ HTTP/1.1" 204 0
+INFO 2026-03-25 21:55:41,015 log 27660 30848 "OPTIONS /api/documents/ HTTP/1.1" 200 0
+INFO 2026-03-25 21:55:41,015 log 27660 28980 "OPTIONS /api/documents/ HTTP/1.1" 200 0
+INFO 2026-03-25 21:55:41,021 log 27660 2464 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-25 21:55:41,028 log 27660 28980 "GET /api/documents/ HTTP/1.1" 200 2
+INFO 2026-03-25 21:55:41,032 log 27660 2464 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-25 21:55:41,042 log 27660 28980 "GET /api/documents/ HTTP/1.1" 200 2
+INFO 2026-03-25 21:55:41,761 log 27660 28980 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-25 21:55:41,775 log 27660 28980 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-25 21:55:52,189 log 27660 28980 "GET /api/documents/ HTTP/1.1" 200 2
+INFO 2026-03-25 21:55:52,195 log 27660 2464 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-25 21:55:52,203 log 27660 28980 "GET /api/documents/ HTTP/1.1" 200 2
+INFO 2026-03-25 21:55:52,203 log 27660 2464 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-25 21:56:06,429 log 27660 2464 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-25 21:56:06,435 log 27660 2464 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-26 14:54:48,963 autoreload 6276 4476 Watching for file changes with StatReloader
+INFO 2026-03-26 14:56:58,507 autoreload 11876 8308 Watching for file changes with StatReloader
+INFO 2026-03-26 14:57:46,267 log 11876 23028 "OPTIONS /api/employees/ HTTP/1.1" 200 0
+INFO 2026-03-26 14:57:46,268 log 11876 18916 "OPTIONS /api/departments/ HTTP/1.1" 200 0
+INFO 2026-03-26 14:57:46,268 log 11876 27664 "OPTIONS /api/departments/ HTTP/1.1" 200 0
+INFO 2026-03-26 14:57:46,271 log 11876 23028 "OPTIONS /api/employees/ HTTP/1.1" 200 0
+WARNING 2026-03-26 14:57:46,322 log 11876 27664 "GET /api/employees/ HTTP/1.1" 401 172
+WARNING 2026-03-26 14:57:46,323 log 11876 18916 "GET /api/departments/ HTTP/1.1" 401 172
+WARNING 2026-03-26 14:57:46,330 log 11876 27664 "GET /api/employees/ HTTP/1.1" 401 172
+INFO 2026-03-26 14:57:46,330 log 11876 20060 "OPTIONS /api/auth/refresh/ HTTP/1.1" 200 0
+WARNING 2026-03-26 14:57:46,331 log 11876 18916 "GET /api/departments/ HTTP/1.1" 401 172
+INFO 2026-03-26 14:57:46,331 log 11876 23028 "OPTIONS /api/auth/refresh/ HTTP/1.1" 200 0
+INFO 2026-03-26 14:57:46,351 log 11876 18916 "POST /api/auth/refresh/ HTTP/1.1" 200 587
+INFO 2026-03-26 14:57:46,357 log 11876 27664 "POST /api/auth/refresh/ HTTP/1.1" 200 587
+INFO 2026-03-26 14:57:46,365 log 11876 23028 "POST /api/auth/refresh/ HTTP/1.1" 200 587
+INFO 2026-03-26 14:57:46,369 log 11876 20060 "POST /api/auth/refresh/ HTTP/1.1" 200 587
+INFO 2026-03-26 14:57:46,377 log 11876 18916 "GET /api/employees/ HTTP/1.1" 200 128
+INFO 2026-03-26 14:57:46,392 log 11876 18916 "GET /api/employees/ HTTP/1.1" 200 128
+INFO 2026-03-26 14:57:46,417 log 11876 27664 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-26 14:57:46,427 log 11876 27664 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-26 14:57:47,902 log 11876 27656 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-26 14:57:47,908 log 11876 27656 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-26 14:59:29,035 autoreload 21204 31700 Watching for file changes with StatReloader
+INFO 2026-03-26 15:00:38,845 autoreload 25372 18064 Watching for file changes with StatReloader
+INFO 2026-03-26 15:25:50,521 log 25372 38604 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-26 15:25:50,526 log 25372 38604 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-26 15:25:52,999 log 25372 38604 "GET /api/employees/ HTTP/1.1" 200 128
+INFO 2026-03-26 15:25:53,006 log 25372 16176 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-26 15:25:53,006 log 25372 38604 "GET /api/employees/ HTTP/1.1" 200 128
+INFO 2026-03-26 15:25:53,010 log 25372 16176 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-26 15:25:56,506 log 25372 16176 "OPTIONS /api/employees/4/ HTTP/1.1" 200 0
+INFO 2026-03-26 15:25:56,529 log 25372 16176 "DELETE /api/employees/4/ HTTP/1.1" 204 0
+INFO 2026-03-26 15:26:22,685 log 25372 16176 "POST /api/employees/ HTTP/1.1" 201 122
+INFO 2026-03-26 15:26:41,453 log 25372 37304 "OPTIONS /api/auth/login/ HTTP/1.1" 200 0
+WARNING 2026-03-26 15:26:42,003 log 25372 37304 "POST /api/auth/login/ HTTP/1.1" 401 63
+INFO 2026-03-26 15:27:31,240 log 25372 38604 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-26 15:27:31,240 log 25372 16176 "GET /api/employees/ HTTP/1.1" 200 124
+INFO 2026-03-26 15:27:31,249 log 25372 38604 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-26 15:27:31,249 log 25372 16176 "GET /api/employees/ HTTP/1.1" 200 124
+WARNING 2026-03-26 15:31:12,136 log 25372 15328 "GET /api/departments/ HTTP/1.1" 401 172
+WARNING 2026-03-26 15:31:12,144 log 25372 15328 "GET /api/departments/ HTTP/1.1" 401 172
+WARNING 2026-03-26 15:31:12,146 log 25372 5360 "GET /api/employees/ HTTP/1.1" 401 172
+WARNING 2026-03-26 15:31:12,160 log 25372 5360 "GET /api/employees/ HTTP/1.1" 401 172
+INFO 2026-03-26 15:31:12,173 log 25372 15328 "POST /api/auth/refresh/ HTTP/1.1" 200 587
+INFO 2026-03-26 15:31:12,177 log 25372 18112 "POST /api/auth/refresh/ HTTP/1.1" 200 587
+INFO 2026-03-26 15:31:12,181 log 25372 5360 "POST /api/auth/refresh/ HTTP/1.1" 200 587
+INFO 2026-03-26 15:31:12,181 log 25372 3052 "POST /api/auth/refresh/ HTTP/1.1" 200 587
+INFO 2026-03-26 15:31:12,198 log 25372 5360 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-26 15:31:12,202 log 25372 3052 "GET /api/employees/ HTTP/1.1" 200 124
+INFO 2026-03-26 15:31:12,215 log 25372 5360 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-26 15:31:12,218 log 25372 3052 "GET /api/employees/ HTTP/1.1" 200 124
+INFO 2026-03-27 20:10:00,425 autoreload 35184 21396 Watching for file changes with StatReloader
+INFO 2026-03-27 20:10:44,900 log 35184 36904 "OPTIONS /api/employees/ HTTP/1.1" 200 0
+INFO 2026-03-27 20:10:44,900 log 35184 10796 "OPTIONS /api/departments/ HTTP/1.1" 200 0
+INFO 2026-03-27 20:10:44,900 log 35184 27428 "OPTIONS /api/employees/ HTTP/1.1" 200 0
+INFO 2026-03-27 20:10:44,901 log 35184 33144 "OPTIONS /api/departments/ HTTP/1.1" 200 0
+WARNING 2026-03-27 20:10:44,925 log 35184 36904 "GET /api/employees/ HTTP/1.1" 401 172
+WARNING 2026-03-27 20:10:44,926 log 35184 10796 "GET /api/departments/ HTTP/1.1" 401 172
+INFO 2026-03-27 20:10:44,929 log 35184 27428 "OPTIONS /api/auth/refresh/ HTTP/1.1" 200 0
+INFO 2026-03-27 20:10:44,929 log 35184 33144 "OPTIONS /api/auth/refresh/ HTTP/1.1" 200 0
+WARNING 2026-03-27 20:10:44,929 log 35184 36904 "GET /api/employees/ HTTP/1.1" 401 172
+WARNING 2026-03-27 20:10:44,929 log 35184 10796 "GET /api/departments/ HTTP/1.1" 401 172
+WARNING 2026-03-27 20:10:44,935 log 35184 33144 "POST /api/auth/refresh/ HTTP/1.1" 401 54
+WARNING 2026-03-27 20:10:44,936 log 35184 10796 "POST /api/auth/refresh/ HTTP/1.1" 401 54
+WARNING 2026-03-27 20:10:44,936 log 35184 27428 "POST /api/auth/refresh/ HTTP/1.1" 401 54
+WARNING 2026-03-27 20:10:44,936 log 35184 36904 "POST /api/auth/refresh/ HTTP/1.1" 401 54
+INFO 2026-03-27 20:10:58,964 log 35184 36904 "OPTIONS /api/auth/login/ HTTP/1.1" 200 0
+INFO 2026-03-27 20:10:59,666 log 35184 36904 "POST /api/auth/login/ HTTP/1.1" 200 587
+INFO 2026-03-27 20:10:59,669 log 35184 36904 "OPTIONS /api/auth/profile/ HTTP/1.1" 200 0
+INFO 2026-03-27 20:10:59,682 log 35184 36904 "GET /api/auth/profile/ HTTP/1.1" 200 135
+WARNING 2026-03-27 20:12:24,514 log 35184 31488 "GET /api/employees/ HTTP/1.1" 401 58
+WARNING 2026-03-27 20:12:24,516 log 35184 19024 "GET /api/employees/ HTTP/1.1" 401 58
+INFO 2026-03-27 20:12:42,698 log 35184 36904 "POST /api/auth/login/ HTTP/1.1" 200 587
+INFO 2026-03-27 20:12:42,703 log 35184 36904 "GET /api/auth/profile/ HTTP/1.1" 200 135
+INFO 2026-03-27 20:12:54,719 log 35184 36904 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-27 20:12:54,723 log 35184 10796 "GET /api/auth/profile/ HTTP/1.1" 200 135
+INFO 2026-03-27 20:12:54,727 log 35184 36904 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-27 20:12:55,420 log 35184 10796 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-27 20:12:55,420 log 35184 36904 "GET /api/employees/ HTTP/1.1" 200 124
+INFO 2026-03-27 20:12:55,429 log 35184 27428 "GET /api/auth/profile/ HTTP/1.1" 200 135
+INFO 2026-03-27 20:12:55,430 log 35184 36904 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-27 20:12:55,430 log 35184 10796 "GET /api/employees/ HTTP/1.1" 200 124
+INFO 2026-03-27 20:12:59,644 log 35184 10796 "OPTIONS /api/tickets/ HTTP/1.1" 200 0
+INFO 2026-03-27 20:12:59,658 log 35184 27428 "GET /api/auth/profile/ HTTP/1.1" 200 135
+INFO 2026-03-27 20:12:59,658 log 35184 10796 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-27 20:12:59,662 log 35184 36904 "GET /api/employees/ HTTP/1.1" 200 124
+INFO 2026-03-27 20:12:59,670 log 35184 33144 "GET /api/tickets/ HTTP/1.1" 200 2
+INFO 2026-03-27 20:12:59,670 log 35184 10796 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-27 20:12:59,670 log 35184 36904 "GET /api/employees/ HTTP/1.1" 200 124
+INFO 2026-03-27 20:12:59,674 log 35184 36904 "GET /api/tickets/ HTTP/1.1" 200 2
+INFO 2026-03-27 20:13:06,116 log 35184 36904 "POST /api/tickets/ HTTP/1.1" 201 258
+INFO 2026-03-27 20:13:14,308 log 35184 36904 "OPTIONS /api/documents/ HTTP/1.1" 200 0
+INFO 2026-03-27 20:13:14,309 log 35184 33144 "OPTIONS /api/documents/ HTTP/1.1" 200 0
+INFO 2026-03-27 20:13:14,322 log 35184 10796 "GET /api/auth/profile/ HTTP/1.1" 200 135
+INFO 2026-03-27 20:13:14,323 log 35184 36904 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-27 20:13:14,323 log 35184 33144 "GET /api/documents/ HTTP/1.1" 200 2
+INFO 2026-03-27 20:13:14,330 log 35184 33144 "GET /api/documents/ HTTP/1.1" 200 2
+INFO 2026-03-27 20:13:14,344 log 35184 36904 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-27 20:13:21,716 log 35184 36904 "POST /api/documents/ HTTP/1.1" 201 257
+INFO 2026-03-27 20:13:30,540 log 35184 11948 "GET /media/documents/Frontend_report.docx HTTP/1.1" 200 1673988
+INFO 2026-03-27 20:13:52,026 log 35184 33144 "GET /api/auth/profile/ HTTP/1.1" 200 135
+INFO 2026-03-27 20:13:52,026 log 35184 36904 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-27 20:13:52,031 log 35184 36904 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-27 20:13:54,821 log 35184 36904 "GET /api/auth/profile/ HTTP/1.1" 200 135
+INFO 2026-03-27 20:13:55,942 log 35184 33144 "GET /api/auth/profile/ HTTP/1.1" 200 135
+INFO 2026-03-27 20:13:55,942 log 35184 36904 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-27 20:13:55,947 log 35184 36904 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-27 20:13:56,671 log 35184 10796 "GET /api/auth/profile/ HTTP/1.1" 200 135
+INFO 2026-03-27 20:13:56,673 log 35184 36904 "GET /api/employees/ HTTP/1.1" 200 124
+INFO 2026-03-27 20:13:56,673 log 35184 33144 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-27 20:13:56,679 log 35184 36904 "GET /api/employees/ HTTP/1.1" 200 124
+INFO 2026-03-27 20:13:56,679 log 35184 33144 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-27 20:13:57,329 log 35184 27428 "GET /api/auth/profile/ HTTP/1.1" 200 135
+INFO 2026-03-27 20:13:57,330 log 35184 33144 "GET /api/tickets/ HTTP/1.1" 200 260
+INFO 2026-03-27 20:13:57,331 log 35184 36904 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-27 20:13:57,332 log 35184 10796 "GET /api/employees/ HTTP/1.1" 200 124
+INFO 2026-03-27 20:13:57,340 log 35184 33144 "GET /api/tickets/ HTTP/1.1" 200 260
+INFO 2026-03-27 20:13:57,340 log 35184 36904 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-27 20:13:57,340 log 35184 10796 "GET /api/employees/ HTTP/1.1" 200 124
+INFO 2026-03-27 20:13:57,710 log 35184 36904 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-27 20:13:57,712 log 35184 33144 "GET /api/auth/profile/ HTTP/1.1" 200 135
+INFO 2026-03-27 20:13:57,713 log 35184 10796 "GET /api/documents/ HTTP/1.1" 200 259
+INFO 2026-03-27 20:13:57,718 log 35184 27428 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-27 20:13:57,718 log 35184 10796 "GET /api/documents/ HTTP/1.1" 200 259
+INFO 2026-03-27 20:13:58,440 log 35184 27428 "GET /api/auth/profile/ HTTP/1.1" 200 135
+INFO 2026-03-27 20:13:58,440 log 35184 10796 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-27 20:13:58,445 log 35184 10796 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-27 20:14:00,648 log 35184 27428 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-27 20:14:00,648 log 35184 36904 "GET /api/auth/profile/ HTTP/1.1" 200 135
+INFO 2026-03-27 20:14:00,653 log 35184 33144 "GET /api/employees/ HTTP/1.1" 200 124
+INFO 2026-03-27 20:14:00,653 log 35184 10796 "GET /api/tickets/ HTTP/1.1" 200 260
+INFO 2026-03-27 20:14:00,659 log 35184 27428 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-27 20:14:00,663 log 35184 36904 "GET /api/tickets/ HTTP/1.1" 200 260
+INFO 2026-03-27 20:14:00,664 log 35184 33144 "GET /api/employees/ HTTP/1.1" 200 124
+INFO 2026-03-27 20:14:01,037 log 35184 27428 "GET /api/auth/profile/ HTTP/1.1" 200 135
+INFO 2026-03-27 20:14:01,037 log 35184 36904 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-27 20:14:01,037 log 35184 33144 "GET /api/employees/ HTTP/1.1" 200 124
+INFO 2026-03-27 20:14:01,044 log 35184 33144 "GET /api/employees/ HTTP/1.1" 200 124
+INFO 2026-03-27 20:14:01,044 log 35184 36904 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-27 20:14:02,798 log 35184 36904 "GET /api/auth/profile/ HTTP/1.1" 200 135
+INFO 2026-03-27 20:14:08,299 log 35184 36904 "GET /api/auth/profile/ HTTP/1.1" 200 135
+INFO 2026-03-27 20:14:13,941 log 35184 36904 "POST /api/auth/login/ HTTP/1.1" 200 587
+INFO 2026-03-27 20:14:13,945 log 35184 36904 "GET /api/auth/profile/ HTTP/1.1" 200 135
+INFO 2026-03-27 20:14:13,995 log 35184 36904 "GET /api/auth/profile/ HTTP/1.1" 200 135
+INFO 2026-03-27 20:14:20,723 log 35184 27428 "GET /api/auth/profile/ HTTP/1.1" 200 135
+INFO 2026-03-27 20:14:20,723 log 35184 36904 "GET /api/employees/ HTTP/1.1" 200 124
+INFO 2026-03-27 20:14:20,723 log 35184 33144 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-27 20:14:20,730 log 35184 36904 "GET /api/employees/ HTTP/1.1" 200 124
+INFO 2026-03-27 20:14:20,730 log 35184 33144 "GET /api/departments/ HTTP/1.1" 200 139
+WARNING 2026-03-27 20:14:54,983 log 35184 33144 "POST /api/employees/ HTTP/1.1" 400 54
+INFO 2026-03-27 20:16:11,230 log 35184 35104 "POST /api/auth/login/ HTTP/1.1" 200 587
+INFO 2026-03-27 20:16:11,237 log 35184 33372 "GET /api/employees/ HTTP/1.1" 200 124
+INFO 2026-03-27 20:16:11,797 log 35184 30572 "POST /api/employees/ HTTP/1.1" 201 108
+INFO 2026-03-27 20:16:21,944 log 35184 32484 "POST /api/auth/login/ HTTP/1.1" 200 587
+WARNING 2026-03-27 20:16:21,950 log 35184 32172 "POST /api/employees/ HTTP/1.1" 400 54
+INFO 2026-03-27 20:16:21,977 log 35184 23048 "DELETE /api/employees/6/ HTTP/1.1" 204 0
+INFO 2026-03-27 20:17:16,267 autoreload 35184 21396 C:\Users\DAUD.TUFGAMING\Intranet\intranet_backend\employees\views.py changed, reloading.
+INFO 2026-03-27 20:17:17,754 autoreload 22292 10504 Watching for file changes with StatReloader
+INFO 2026-03-27 20:17:20,854 autoreload 22292 10504 C:\Users\DAUD.TUFGAMING\Intranet\intranet_backend\employees\views.py changed, reloading.
+INFO 2026-03-27 20:17:22,184 autoreload 16648 14904 Watching for file changes with StatReloader
+WARNING 2026-03-27 20:17:52,966 log 16648 34868 "POST /api/employees/ HTTP/1.1" 401 51
+ERROR 2026-03-27 20:17:53,161 log 16648 34868 Internal Server Error: /api/auth/refresh/
+Traceback (most recent call last):
+  File "C:\Users\DAUD.TUFGAMING\Intranet\.venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DAUD.TUFGAMING\Intranet\.venv\Lib\site-packages\django\core\handlers\base.py", line 198, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DAUD.TUFGAMING\Intranet\.venv\Lib\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DAUD.TUFGAMING\Intranet\.venv\Lib\site-packages\django\views\generic\base.py", line 106, in view
+    return self.dispatch(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DAUD.TUFGAMING\Intranet\.venv\Lib\site-packages\rest_framework\views.py", line 515, in dispatch
+    response = self.handle_exception(exc)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DAUD.TUFGAMING\Intranet\.venv\Lib\site-packages\rest_framework\views.py", line 475, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "C:\Users\DAUD.TUFGAMING\Intranet\.venv\Lib\site-packages\rest_framework\views.py", line 486, in raise_uncaught_exception
+    raise exc
+  File "C:\Users\DAUD.TUFGAMING\Intranet\.venv\Lib\site-packages\rest_framework\views.py", line 512, in dispatch
+    response = handler(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DAUD.TUFGAMING\Intranet\.venv\Lib\site-packages\rest_framework_simplejwt\views.py", line 46, in post
+    serializer.is_valid(raise_exception=True)
+  File "C:\Users\DAUD.TUFGAMING\Intranet\.venv\Lib\site-packages\rest_framework\serializers.py", line 225, in is_valid
+    self._validated_data = self.run_validation(self.initial_data)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DAUD.TUFGAMING\Intranet\.venv\Lib\site-packages\rest_framework\serializers.py", line 459, in run_validation
+    value = self.validate(value)
+            ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DAUD.TUFGAMING\Intranet\.venv\Lib\site-packages\rest_framework_simplejwt\serializers.py", line 116, in validate
+    user := get_user_model().objects.get(
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DAUD.TUFGAMING\Intranet\.venv\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DAUD.TUFGAMING\Intranet\.venv\Lib\site-packages\django\db\models\query.py", line 639, in get
+    raise self.model.DoesNotExist(
+accounts.models.User.DoesNotExist: User matching query does not exist.
+ERROR 2026-03-27 20:17:53,164 log 16648 34868 "POST /api/auth/refresh/ HTTP/1.1" 500 129344
+WARNING 2026-03-27 20:18:02,621 log 16648 34868 "POST /api/employees/ HTTP/1.1" 401 58
+WARNING 2026-03-27 20:18:08,781 log 16648 34868 "GET /api/employees/ HTTP/1.1" 401 58
+WARNING 2026-03-27 20:18:08,782 log 16648 36580 "GET /api/departments/ HTTP/1.1" 401 58
+WARNING 2026-03-27 20:18:08,786 log 16648 34868 "GET /api/employees/ HTTP/1.1" 401 58
+WARNING 2026-03-27 20:18:08,786 log 16648 36580 "GET /api/departments/ HTTP/1.1" 401 58
+INFO 2026-03-27 20:18:10,648 log 16648 36580 "POST /api/auth/login/ HTTP/1.1" 200 587
+INFO 2026-03-27 20:18:10,654 log 16648 36580 "GET /api/auth/profile/ HTTP/1.1" 200 135
+INFO 2026-03-27 20:18:10,807 log 16648 36580 "GET /api/auth/profile/ HTTP/1.1" 200 135
+INFO 2026-03-27 20:18:13,921 log 16648 34868 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-27 20:18:13,921 log 16648 36580 "GET /api/employees/ HTTP/1.1" 200 124
+INFO 2026-03-27 20:18:13,927 log 16648 33184 "GET /api/auth/profile/ HTTP/1.1" 200 135
+INFO 2026-03-27 20:18:13,930 log 16648 36580 "GET /api/employees/ HTTP/1.1" 200 124
+INFO 2026-03-27 20:18:13,930 log 16648 34868 "GET /api/departments/ HTTP/1.1" 200 139
+WARNING 2026-03-27 20:18:33,102 log 16648 34868 "POST /api/employees/ HTTP/1.1" 400 54
+WARNING 2026-03-27 20:18:36,355 log 16648 34868 "POST /api/employees/ HTTP/1.1" 400 54
+INFO 2026-03-27 20:18:53,071 log 16648 34868 "POST /api/employees/ HTTP/1.1" 201 124
+INFO 2026-03-27 20:24:40,502 autoreload 16648 14904 C:\Users\DAUD.TUFGAMING\Intranet\intranet_backend\employees\views.py changed, reloading.
+INFO 2026-03-27 20:24:41,865 autoreload 8508 9056 Watching for file changes with StatReloader
+INFO 2026-03-27 20:24:44,930 autoreload 8508 9056 C:\Users\DAUD.TUFGAMING\Intranet\intranet_backend\departments\views.py changed, reloading.
+INFO 2026-03-27 20:24:46,228 autoreload 2008 29128 Watching for file changes with StatReloader
+INFO 2026-03-27 20:24:52,897 autoreload 2008 29128 C:\Users\DAUD.TUFGAMING\Intranet\intranet_backend\tickets\views.py changed, reloading.
+INFO 2026-03-27 20:24:54,234 autoreload 35456 28280 Watching for file changes with StatReloader
+INFO 2026-03-27 20:24:58,508 autoreload 35456 28280 C:\Users\DAUD.TUFGAMING\Intranet\intranet_backend\tickets\permissions.py changed, reloading.
+INFO 2026-03-27 20:24:59,855 autoreload 28484 39540 Watching for file changes with StatReloader
+INFO 2026-03-27 20:25:04,099 autoreload 28484 39540 C:\Users\DAUD.TUFGAMING\Intranet\intranet_backend\documents\views.py changed, reloading.
+INFO 2026-03-27 20:25:05,447 autoreload 14004 32192 Watching for file changes with StatReloader
+INFO 2026-03-27 20:25:20,404 autoreload 14004 32192 C:\Users\DAUD.TUFGAMING\Intranet\intranet_backend\employees\views.py changed, reloading.
+INFO 2026-03-27 20:25:21,780 autoreload 35756 25828 Watching for file changes with StatReloader
+INFO 2026-03-27 20:26:07,145 log 35756 20324 "GET /api/employees/ HTTP/1.1" 200 249
+INFO 2026-03-27 20:26:07,146 log 35756 27188 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-27 20:27:30,882 log 35756 39852 "POST /api/auth/login/ HTTP/1.1" 200 587
+INFO 2026-03-27 20:27:30,888 log 35756 38472 "GET /api/departments/ HTTP/1.1" 200 139
+WARNING 2026-03-27 20:27:30,893 log 35756 13084 "POST /api/employees/ HTTP/1.1" 403 62
+WARNING 2026-03-27 20:27:31,425 log 35756 32636 "POST /api/auth/login/ HTTP/1.1" 401 63
+INFO 2026-03-27 20:27:42,496 autoreload 35756 25828 C:\Users\DAUD.TUFGAMING\Intranet\intranet_backend\accounts\permissions.py changed, reloading.
+INFO 2026-03-27 20:27:43,895 autoreload 39872 6344 Watching for file changes with StatReloader
+INFO 2026-03-27 20:28:01,790 log 39872 18136 "POST /api/auth/login/ HTTP/1.1" 200 587
+INFO 2026-03-27 20:28:01,798 log 39872 7048 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-27 20:28:02,363 log 39872 33632 "POST /api/employees/ HTTP/1.1" 201 134
+INFO 2026-03-27 20:28:02,924 log 39872 36356 "POST /api/auth/login/ HTTP/1.1" 200 654
+WARNING 2026-03-27 20:28:02,931 log 39872 8568 "POST /api/employees/ HTTP/1.1" 403 48
+INFO 2026-03-27 20:28:03,496 log 39872 38936 "POST /api/employees/ HTTP/1.1" 201 135
+WARNING 2026-03-27 20:28:03,502 log 39872 15720 "POST /api/departments/ HTTP/1.1" 403 49
+INFO 2026-03-27 20:28:04,054 log 39872 6108 "POST /api/auth/login/ HTTP/1.1" 200 659
+WARNING 2026-03-27 20:28:04,059 log 39872 24952 "POST /api/tickets/ HTTP/1.1" 403 62
+INFO 2026-03-27 20:28:04,080 log 39872 17780 "DELETE /api/employees/9/ HTTP/1.1" 204 0
+INFO 2026-03-27 20:28:04,101 log 39872 9644 "DELETE /api/employees/8/ HTTP/1.1" 204 0
+INFO 2026-03-27 20:28:05,386 autoreload 39872 6344 C:\Users\DAUD.TUFGAMING\Intranet\intranet_backend\accounts\permissions.py changed, reloading.
+INFO 2026-03-27 20:28:06,555 autoreload 39652 38988 Watching for file changes with StatReloader
+INFO 2026-03-27 20:28:48,629 log 39652 27480 "POST /api/auth/login/ HTTP/1.1" 200 587
+INFO 2026-03-27 20:28:48,638 log 39652 3300 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-27 20:28:49,218 log 39652 9676 "POST /api/employees/ HTTP/1.1" 201 128
+INFO 2026-03-27 20:28:49,769 log 39652 5436 "POST /api/employees/ HTTP/1.1" 201 128
+INFO 2026-03-27 20:28:50,312 log 39652 31488 "POST /api/auth/login/ HTTP/1.1" 200 646
+INFO 2026-03-27 20:28:50,334 log 39652 20680 "POST /api/tickets/ HTTP/1.1" 201 262
+WARNING 2026-03-27 20:28:50,343 log 39652 23188 "POST /api/tickets/4/assign/ HTTP/1.1" 400 59
+INFO 2026-03-27 20:28:50,866 log 39652 18128 "POST /api/auth/login/ HTTP/1.1" 200 649
+WARNING 2026-03-27 20:28:50,873 log 39652 20368 "POST /api/tickets/4/change-status/ HTTP/1.1" 403 63
+INFO 2026-03-27 20:28:50,890 log 39652 7688 "DELETE /api/tickets/4/ HTTP/1.1" 204 0
+INFO 2026-03-27 20:28:50,913 log 39652 34940 "DELETE /api/employees/11/ HTTP/1.1" 204 0
+INFO 2026-03-27 20:28:50,932 log 39652 4984 "DELETE /api/employees/10/ HTTP/1.1" 204 0
+INFO 2026-03-27 20:29:18,478 autoreload 39652 38988 C:\Users\DAUD.TUFGAMING\Intranet\intranet_backend\employees\serializers.py changed, reloading.
+INFO 2026-03-27 20:29:19,978 autoreload 34912 23900 Watching for file changes with StatReloader
+INFO 2026-03-27 20:29:38,707 autoreload 34912 23900 C:\Users\DAUD.TUFGAMING\Intranet\intranet_backend\employees\serializers.py changed, reloading.
+INFO 2026-03-27 20:29:40,270 autoreload 29820 9056 Watching for file changes with StatReloader
+INFO 2026-03-27 20:29:47,804 log 29820 12208 "POST /api/auth/login/ HTTP/1.1" 200 587
+INFO 2026-03-27 20:29:47,811 log 29820 9548 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-27 20:29:48,398 log 29820 15556 "POST /api/employees/ HTTP/1.1" 201 141
+INFO 2026-03-27 20:29:48,942 log 29820 30828 "POST /api/employees/ HTTP/1.1" 201 141
+INFO 2026-03-27 20:29:48,950 log 29820 37060 "GET /api/employees/ HTTP/1.1" 200 558
+INFO 2026-03-27 20:29:49,492 log 29820 31204 "POST /api/auth/login/ HTTP/1.1" 200 646
+INFO 2026-03-27 20:29:49,511 log 29820 31520 "POST /api/tickets/ HTTP/1.1" 201 262
+INFO 2026-03-27 20:29:49,530 log 29820 34904 "POST /api/tickets/5/assign/ HTTP/1.1" 200 285
+INFO 2026-03-27 20:29:50,058 log 29820 7728 "POST /api/auth/login/ HTTP/1.1" 200 649
+INFO 2026-03-27 20:29:50,074 log 29820 37296 "POST /api/tickets/5/change-status/ HTTP/1.1" 200 292
+INFO 2026-03-27 20:29:50,089 log 29820 12400 "DELETE /api/tickets/5/ HTTP/1.1" 204 0
+INFO 2026-03-27 20:29:50,109 log 29820 33184 "DELETE /api/employees/13/ HTTP/1.1" 204 0
+INFO 2026-03-27 20:29:50,130 log 29820 7080 "DELETE /api/employees/12/ HTTP/1.1" 204 0
+WARNING 2026-03-27 20:30:56,885 log 29820 34148 "POST /api/auth/login/ HTTP/1.1" 401 63
+WARNING 2026-03-27 20:33:47,493 log 29820 34148 "POST /api/auth/login/ HTTP/1.1" 401 63
+INFO 2026-03-27 20:33:58,895 log 29820 34148 "POST /api/auth/login/ HTTP/1.1" 200 587
+INFO 2026-03-27 20:33:58,901 log 29820 34148 "GET /api/auth/profile/ HTTP/1.1" 200 135
+INFO 2026-03-27 20:33:59,084 log 29820 34148 "GET /api/auth/profile/ HTTP/1.1" 200 135
+INFO 2026-03-27 20:34:03,476 log 29820 34148 "GET /api/employees/ HTTP/1.1" 200 274
+INFO 2026-03-27 20:34:03,477 log 29820 4248 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-27 20:34:03,479 log 29820 9048 "GET /api/auth/profile/ HTTP/1.1" 200 135
+INFO 2026-03-27 20:34:03,483 log 29820 4248 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-27 20:34:03,483 log 29820 34148 "GET /api/employees/ HTTP/1.1" 200 274
+INFO 2026-03-27 20:35:04,996 log 29820 34148 "GET /api/tickets/ HTTP/1.1" 200 2
+INFO 2026-03-27 20:35:04,996 log 29820 4248 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-27 20:35:05,004 log 29820 34148 "GET /api/tickets/ HTTP/1.1" 200 2
+INFO 2026-03-27 20:35:05,004 log 29820 5932 "GET /api/auth/profile/ HTTP/1.1" 200 135
+INFO 2026-03-27 20:35:05,004 log 29820 9048 "GET /api/employees/ HTTP/1.1" 200 274
+INFO 2026-03-27 20:35:05,006 log 29820 39724 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-27 20:35:05,012 log 29820 9048 "GET /api/employees/ HTTP/1.1" 200 274
+INFO 2026-03-27 20:35:07,236 log 29820 39724 "GET /api/auth/profile/ HTTP/1.1" 200 135
+INFO 2026-03-27 20:35:07,237 log 29820 9048 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-27 20:35:07,240 log 29820 9048 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-27 20:35:08,887 log 29820 39724 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-27 20:35:08,887 log 29820 34148 "GET /api/auth/profile/ HTTP/1.1" 200 135
+INFO 2026-03-27 20:35:08,887 log 29820 9048 "GET /api/documents/ HTTP/1.1" 200 2
+INFO 2026-03-27 20:35:08,893 log 29820 39724 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-27 20:35:08,893 log 29820 9048 "GET /api/documents/ HTTP/1.1" 200 2
+INFO 2026-03-27 20:35:11,231 log 29820 9048 "GET /api/auth/profile/ HTTP/1.1" 200 135
+INFO 2026-03-27 20:40:16,740 autoreload 29820 9056 C:\Users\DAUD.TUFGAMING\Intranet\intranet_backend\accounts\serializers.py changed, reloading.
+INFO 2026-03-27 20:40:18,571 autoreload 19648 29884 Watching for file changes with StatReloader
+INFO 2026-03-27 20:40:32,525 autoreload 19648 29884 C:\Users\DAUD.TUFGAMING\Intranet\intranet_backend\accounts\serializers.py changed, reloading.
+INFO 2026-03-27 20:40:33,963 autoreload 18552 6184 Watching for file changes with StatReloader
+INFO 2026-03-27 20:40:52,499 log 18552 20260 "POST /api/auth/login/ HTTP/1.1" 200 579
+INFO 2026-03-27 20:40:52,507 log 18552 11272 "GET /api/auth/profile/ HTTP/1.1" 200 132
+INFO 2026-03-27 20:45:52,008 autoreload 18552 6184 C:\Users\DAUD.TUFGAMING\Intranet\intranet_backend\employees\models.py changed, reloading.
+INFO 2026-03-27 20:45:53,408 autoreload 26952 39012 Watching for file changes with StatReloader
+INFO 2026-03-27 20:46:01,211 autoreload 26952 39012 C:\Users\DAUD.TUFGAMING\Intranet\intranet_backend\employees\models.py changed, reloading.
+INFO 2026-03-27 20:46:02,662 autoreload 27940 25964 Watching for file changes with StatReloader
+INFO 2026-03-27 20:46:04,533 autoreload 27940 25964 C:\Users\DAUD.TUFGAMING\Intranet\intranet_backend\employees\serializers.py changed, reloading.
+INFO 2026-03-27 20:46:05,969 autoreload 7620 29924 Watching for file changes with StatReloader
+INFO 2026-03-27 20:46:10,238 autoreload 7620 29924 C:\Users\DAUD.TUFGAMING\Intranet\intranet_backend\employees\views.py changed, reloading.
+INFO 2026-03-27 20:46:11,546 autoreload 28296 24012 Watching for file changes with StatReloader
+INFO 2026-03-27 20:46:19,329 autoreload 28296 24012 C:\Users\DAUD.TUFGAMING\Intranet\intranet_backend\employees\views.py changed, reloading.
+INFO 2026-03-27 20:46:20,639 autoreload 29104 29092 Watching for file changes with StatReloader
+INFO 2026-03-27 20:46:32,063 autoreload 29104 29092 C:\Users\DAUD.TUFGAMING\Intranet\intranet_backend\employees\views.py changed, reloading.
+INFO 2026-03-27 20:46:33,526 autoreload 14004 32788 Watching for file changes with StatReloader
+INFO 2026-03-27 20:46:44,968 log 14004 26620 "GET /api/auth/profile/ HTTP/1.1" 200 132
+INFO 2026-03-27 20:48:29,114 log 14004 27492 "POST /api/auth/login/ HTTP/1.1" 200 579
+INFO 2026-03-27 20:48:29,667 log 14004 33628 "POST /api/employees/ HTTP/1.1" 201 184
+INFO 2026-03-27 20:48:30,184 log 14004 28736 "POST /api/auth/login/ HTTP/1.1" 200 627
+INFO 2026-03-27 20:48:30,203 log 14004 25856 "DELETE /api/employees/8/ HTTP/1.1" 204 0
+INFO 2026-03-27 20:52:32,904 log 14004 33420 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-27 20:52:32,904 log 14004 14204 "GET /api/auth/profile/ HTTP/1.1" 200 132
+INFO 2026-03-27 20:52:32,907 log 14004 8860 "GET /api/employees/ HTTP/1.1" 200 306
+INFO 2026-03-27 20:52:32,913 log 14004 33420 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-27 20:52:32,916 log 14004 8860 "GET /api/employees/ HTTP/1.1" 200 306
+INFO 2026-03-27 23:40:56,925 log 14004 40544 "OPTIONS /api/employees/ HTTP/1.1" 200 0
+WARNING 2026-03-27 23:40:56,927 log 14004 40544 "POST /api/employees/ HTTP/1.1" 401 172
+INFO 2026-03-27 23:40:56,931 log 14004 40544 "OPTIONS /api/auth/refresh/ HTTP/1.1" 200 0
+INFO 2026-03-27 23:40:56,939 log 14004 40544 "POST /api/auth/refresh/ HTTP/1.1" 200 587
+INFO 2026-03-27 23:40:57,645 log 14004 40544 "POST /api/employees/ HTTP/1.1" 201 153
+INFO 2026-03-27 23:41:10,117 log 14004 40544 "OPTIONS /api/auth/login/ HTTP/1.1" 200 0
+INFO 2026-03-27 23:41:10,749 log 14004 40544 "POST /api/auth/login/ HTTP/1.1" 200 585
+INFO 2026-03-27 23:41:10,751 log 14004 40544 "OPTIONS /api/auth/profile/ HTTP/1.1" 200 0
+INFO 2026-03-27 23:41:10,756 log 14004 40544 "GET /api/auth/profile/ HTTP/1.1" 200 127
+INFO 2026-03-27 23:41:10,840 log 14004 40544 "GET /api/auth/profile/ HTTP/1.1" 200 127
+INFO 2026-03-27 23:41:15,985 log 14004 40544 "OPTIONS /api/tickets/ HTTP/1.1" 200 0
+INFO 2026-03-27 23:41:15,992 log 14004 33404 "OPTIONS /api/departments/ HTTP/1.1" 200 0
+INFO 2026-03-27 23:41:16,002 log 14004 12820 "OPTIONS /api/departments/ HTTP/1.1" 200 0
+INFO 2026-03-27 23:41:16,008 log 14004 40544 "GET /api/tickets/ HTTP/1.1" 200 2
+INFO 2026-03-27 23:41:16,018 log 14004 33404 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-27 23:41:16,019 log 14004 38608 "GET /api/auth/profile/ HTTP/1.1" 200 127
+INFO 2026-03-27 23:41:16,024 log 14004 7400 "GET /api/employees/ HTTP/1.1" 200 460
+INFO 2026-03-27 23:41:16,030 log 14004 40544 "GET /api/tickets/ HTTP/1.1" 200 2
+INFO 2026-03-27 23:41:16,036 log 14004 12820 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-27 23:41:16,037 log 14004 7400 "GET /api/employees/ HTTP/1.1" 200 460
+INFO 2026-03-27 23:41:17,838 log 14004 40544 "GET /api/auth/profile/ HTTP/1.1" 200 127
+INFO 2026-03-27 23:41:17,839 log 14004 7400 "GET /api/employees/ HTTP/1.1" 200 460
+INFO 2026-03-27 23:41:17,839 log 14004 12820 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-27 23:41:17,846 log 14004 12820 "GET /api/departments/ HTTP/1.1" 200 139
+INFO 2026-03-27 23:41:17,847 log 14004 7400 "GET /api/employees/ HTTP/1.1" 200 460
+INFO 2026-03-27 23:53:44,335 autoreload 14004 32788 C:\Users\DAUD.TUFGAMING\Intranet\intranet_backend\employees\views.py changed, reloading.
+INFO 2026-03-27 23:53:46,215 autoreload 18896 22244 Watching for file changes with StatReloader
+INFO 2026-03-27 23:53:49,400 autoreload 18896 22244 C:\Users\DAUD.TUFGAMING\Intranet\intranet_backend\employees\views.py changed, reloading.
+INFO 2026-03-27 23:53:50,867 autoreload 18968 19548 Watching for file changes with StatReloader

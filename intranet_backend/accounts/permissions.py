@@ -12,7 +12,7 @@ class IsAdmin(permissions.BasePermission):
         return (
             request.user
             and request.user.is_authenticated
-            and request.user.role == User.Role.ADMIN
+            and (request.user.is_superuser or request.user.role == User.Role.ADMIN)
         )
 
 
@@ -25,5 +25,8 @@ class IsManagerOrAdmin(permissions.BasePermission):
         return (
             request.user
             and request.user.is_authenticated
-            and request.user.role in (User.Role.ADMIN, User.Role.MANAGER)
+            and (
+                request.user.is_superuser
+                or request.user.role in (User.Role.ADMIN, User.Role.MANAGER)
+            )
         )

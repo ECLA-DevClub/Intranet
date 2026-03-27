@@ -6,6 +6,7 @@ from wagtail.admin.panels import FieldPanel
 class Employee(models.Model):
     name = models.CharField(max_length=255)
     email = models.EmailField(unique=True)
+    username = models.CharField(max_length=150, unique=True, null=True, blank=True)
     position = models.CharField(max_length=255)
     department = models.CharField(max_length=255)
     role = models.CharField(max_length=255)
@@ -19,6 +20,7 @@ class Employee(models.Model):
     panels = [
         FieldPanel('name'),
         FieldPanel('email'),
+        FieldPanel('username'),
         FieldPanel('position'),
         FieldPanel('department'),
         FieldPanel('role'),

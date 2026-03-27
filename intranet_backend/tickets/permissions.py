@@ -47,6 +47,6 @@ class IsTicketAssignee(permissions.BasePermission):
     """
 
     def has_object_permission(self, request, view, obj):
-        if request.user.is_superuser or request.user.role == 'admin':
+        if request.user.is_superuser or request.user.role in ('admin', 'manager'):
             return True
         return obj.assignee == request.user

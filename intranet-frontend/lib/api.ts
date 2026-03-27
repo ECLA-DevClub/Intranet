@@ -9,7 +9,9 @@ import {
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL ??
-  "https://intranet-prodd-production.up.railway.app";
+  (process.env.NODE_ENV === "development"
+    ? "http://127.0.0.1:8000"
+    : "https://intranet-prodd-production.up.railway.app");
 
 const normalizedBaseUrl = API_BASE_URL.replace(/\/+$/, "");
 
@@ -19,6 +21,40 @@ function buildUrl(path: string): string {
   }
   const normalizedPath = path.startsWith("/") ? path : `/${path}`;
   return `${normalizedBaseUrl}${normalizedPath}`;
+}
+
+async function getErrorMessage(
+  response: Response,
+  fallback: string,
+): Promise<string> {
+  try {
+    const data = await response.json();
+    if (typeof data === "string" && data.trim()) return data;
+    if (data?.detail && typeof data.detail === "string") return data.detail;
+    if (data && typeof data === "object") {
+      const firstEntry = Object.entries(data)[0];
+      if (firstEntry) {
+        const [field, value] = firstEntry;
+        if (Array.isArray(value) && value.length > 0) {
+          return `${field}: ${String(value[0])}`;
+        }
+        if (typeof value === "string") {
+          return `${field}: ${value}`;
+        }
+      }
+    }
+  } catch {
+    // Ignore JSON parse errors and fallback to plain text handling below.
+  }
+
+  try {
+    const text = await response.text();
+    if (text.trim()) return text;
+  } catch {
+    // Ignore and use fallback.
+  }
+
+  return fallback;
 }
 
 // --- Types ---
@@ -46,8 +82,10 @@ export interface Ticket {
 
 export interface Employee {
   id: number;
+  user_id?: number | null;
   name: string;
   email: string;
+  username?: string | null;
   password?: string;
   position: string;
   department: string; // Just a string in backend model
@@ -221,7 +259,9 @@ export async function deleteDepartment(id: number): Promise<void> {
 // Employees
 export async function getEmployees(): Promise<Employee[]> {
   const response = await authFetch("/api/employees/");
-  if (!response.ok) throw new Error("Failed to fetch employees");
+  if (!response.ok) {
+    throw new Error(await getErrorMessage(response, "Failed to fetch employees"));
+  }
   return response.json();
 }
 
@@ -231,7 +271,9 @@ export async function createEmployee(data: Partial<Employee>): Promise<Employee>
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
   });
-  if (!response.ok) throw new Error("Failed to create employee");
+  if (!response.ok) {
+    throw new Error(await getErrorMessage(response, "Failed to create employee"));
+  }
   return response.json();
 }
 
@@ -240,6 +282,21 @@ export async function deleteEmployee(id: number): Promise<void> {
     method: "DELETE",
   });
   if (!response.ok) throw new Error("Failed to delete employee");
+}
+
+export async function updateEmployeeRole(
+  id: number,
+  role: "admin" | "manager" | "employee",
+): Promise<Employee> {
+  const response = await authFetch(`/api/employees/${id}/`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ role }),
+  });
+  if (!response.ok) {
+    throw new Error(await getErrorMessage(response, "Failed to update employee role"));
+  }
+  return response.json();
 }
 
 // Tickets
