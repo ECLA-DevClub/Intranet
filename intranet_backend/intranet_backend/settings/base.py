@@ -120,6 +120,7 @@ CSRF_TRUSTED_ORIGINS = [
     "http://localhost:3001",
     "http://127.0.0.1:3000",
     "http://127.0.0.1:3001",
+    "https://intranet-pearl.vercel.app",
 ]
 
 # Database
@@ -223,6 +224,7 @@ WAGTAILDOCS_EXTENSIONS = ['csv', 'docx', 'key', 'odt', 'pdf', 'pptx', 'rtf', 'tx
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
+    "https://intranet-pearl.vercel.app",
 ]
 
 # --- Custom User Model ---

@@ -11,7 +11,7 @@ const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL ??
   (process.env.NODE_ENV === "development"
     ? "http://127.0.0.1:8000"
-    : "https://intranet-prodd-production.up.railway.app");
+    : "https://intranet-backend-sand.vercel.app");
 
 const normalizedBaseUrl = API_BASE_URL.replace(/\/+$/, "");
 
@@ -145,8 +145,8 @@ export async function authFetch(
 
   const refreshed = await refreshAccessToken();
   if (!refreshed) {
-      logoutLocal(); // Logout if refresh fails
-      return first; // Let the caller handle 401 or redirect
+    logoutLocal(); // Logout if refresh fails
+    return first; // Let the caller handle 401 or redirect
   }
 
   return doFetch(refreshed);
@@ -162,7 +162,7 @@ async function refreshAccessToken(): Promise<string | null> {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ refresh }),
     });
-    
+
     if (!response.ok) return null;
 
     const data = await response.json();
@@ -206,11 +206,11 @@ export async function login(params: {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(params),
   });
-  
+
   if (!response.ok) {
-     throw new Error("Login failed");
+    throw new Error("Login failed");
   }
-  
+
   const data = await response.json();
   setTokens({ access: data.access, refresh: data.refresh });
   return fetchMe();
@@ -317,23 +317,23 @@ export async function createTicket(data: { title: string; description: string; d
 }
 
 export async function updateTicketStatus(id: number, status: "in_progress" | "closed"): Promise<Ticket> {
-    const response = await authFetch(`/api/tickets/${id}/change-status/`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status }),
-    });
-    if (!response.ok) throw new Error("Failed to update status");
-    return response.json();
+  const response = await authFetch(`/api/tickets/${id}/change-status/`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ status }),
+  });
+  if (!response.ok) throw new Error("Failed to update status");
+  return response.json();
 }
 
 export async function assignTicket(id: number, assigneeId: number): Promise<Ticket> {
-    const response = await authFetch(`/api/tickets/${id}/assign/`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ assignee: assigneeId }),
-    });
-    if (!response.ok) throw new Error("Failed to assign ticket");
-    return response.json();
+  const response = await authFetch(`/api/tickets/${id}/assign/`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ assignee: assigneeId }),
+  });
+  if (!response.ok) throw new Error("Failed to assign ticket");
+  return response.json();
 }
 
 export async function deleteTicket(id: number): Promise<void> {
@@ -368,10 +368,10 @@ export async function deleteDocument(id: number): Promise<void> {
 }
 
 export async function uploadDocumentVersion(id: number, formData: FormData): Promise<void> {
-    const response = await authFetch(`/api/documents/${id}/upload-version/`, {
-        method: "POST",
-        body: formData,
-    });
-    if (!response.ok) throw new Error("Failed to upload version");
+  const response = await authFetch(`/api/documents/${id}/upload-version/`, {
+    method: "POST",
+    body: formData,
+  });
+  if (!response.ok) throw new Error("Failed to upload version");
 }
 
