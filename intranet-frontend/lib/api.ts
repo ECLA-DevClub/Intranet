@@ -174,27 +174,7 @@ async function refreshAccessToken(): Promise<string | null> {
   }
 }
 
-async function requestJsonOrThrow<T>(
-  path: string,
-  init?: RequestInit,
-): Promise<T> {
-  const response = await fetch(buildUrl(path), {
-    ...init,
-    headers: {
-      "Content-Type": "application/json",
-      ...(init?.headers ?? {}),
-    },
-  });
-
-  if (!response.ok) {
-    const text = await response.text();
-    throw new Error(text || `Request failed: ${response.status}`);
-  }
-
-  return (await response.json()) as T;
-}
-
-// --- Auth Methods ---
+// -- Auth Methods --
 
 export async function login(params: {
   username: string;

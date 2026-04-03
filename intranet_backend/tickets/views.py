@@ -5,7 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from django.db.models import Q
 from documents.permissions import IsAssignedToDepartment
 from accounts.permissions import IsManagerOrAdmin
-from .permissions import IsTicketAssignee, IsTicketParticipant
+from .permissions import IsTicketAssignee, IsTicketParticipant, IsTicketOwner
 from .models import Ticket
 from .serializers import TicketSerializer, StatusChangeSerializer, AssignTicketSerializer
 from audit.models import AuditLog
@@ -19,13 +19,12 @@ class TicketViewSet(viewsets.ModelViewSet):
     serializer_class = TicketSerializer
     
     def get_permissions(self):
-        # Any authenticated user may list/retrieve tickets available in queryset.
-        if self.action in ("list", "retrieve"):
+        # Any authenticated user may list/retrieve/create tickets available in queryset.
+        if self.action in ("list", "retrieve", "create"):
             return [IsAuthenticated()]
 
-        # Only manager/admin can create, update, or delete tickets.
-        if self.action in ("create", "update", "partial_update", "destroy"):
-            return [IsManagerOrAdmin()]
+        if self.action in ("update", "partial_update", "destroy"):
+            return [IsTicketOwner()]
             
         # Assign is restricted to manager/admin and department scope.
         if self.action == "assign":
