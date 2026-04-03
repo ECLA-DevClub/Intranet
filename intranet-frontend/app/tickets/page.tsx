@@ -336,10 +336,12 @@ export default function TicketsPage() {
 
       <ConfirmDialog
         isOpen={deletingId !== null}
-        message={t("common.confirm")}
+        title={t("common.confirm")}
+        message={t("tickets.delete.confirm")}
         onConfirm={confirmDelete}
         onCancel={() => setDeletingId(null)}
         isDestructive
+        confirmLabel={t("common.delete")}
       />
     </div>
   );
