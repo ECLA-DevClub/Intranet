@@ -130,11 +130,13 @@ CSRF_TRUSTED_ORIGINS = [
 
 DATABASES = {
     "default": dj_database_url.config(
-        default="postgresql://postgres.mdjdodwzleuqnwdlpvuz:intranetdevclubengineering2026@aws-1-ap-southeast-2.pooler.supabase.com:5432/postgres",
-        conn_max_age=600,
-        conn_health_checks=True,
+        default="postgresql://postgres.mdjdodwzleuqnwdlpvuz:intranetdevclubengineering2026@aws-1-ap-southeast-2.pooler.supabase.com:6543/postgres",
+        conn_max_age=0,  # Обязательно 0 для Serverless (Vercel)
+        conn_health_checks=False,
     )
 }
+# Защита от багов Server-side Cursors с пулером (PgBouncer)
+DATABASES["default"]["DISABLE_SERVER_SIDE_CURSORS"] = True
 
 
 # Password validation
