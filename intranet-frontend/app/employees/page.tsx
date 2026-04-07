@@ -1,15 +1,13 @@
 "use client";
 
 import { useEffect, useMemo, useState, type FormEvent } from "react";
-import type { Employee } from "@/lib/mockData";
-import { createEmployee, deleteEmployee, getEmployees } from "@/lib/api";
+import type { Employee, Department } from "@/lib/api";
+import { createEmployee, deleteEmployee, getEmployees, getDepartments, updateEmployeeRole } from "@/lib/api";
+import { getStoredUser } from "@/lib/auth";
 import { useLanguage } from "@/components/i18n";
+import ConfirmDialog from "@/components/ConfirmDialog";
 
-const statusStyles: Record<Employee["status"], string> = {
-  Active: "bg-emerald-50 text-emerald-700 border-emerald-200",
-  Remote: "bg-sky-50 text-sky-700 border-sky-200",
-  "On Leave": "bg-amber-50 text-amber-700 border-amber-200",
-};
+const allValue = "ALL";
 
 function FilterPill({
   label,
@@ -25,7 +23,7 @@ function FilterPill({
       type="button"
       onClick={onClick}
       aria-pressed={active}
-      className={`animated-border rounded-full border px-3 py-1 text-xs font-medium transition ${
+      className={`animated-border rounded-full border px-4 py-2 text-sm font-medium transition ${
         active
           ? "border-slate-400 bg-slate-200 text-slate-900"
           : "border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100"
@@ -38,119 +36,140 @@ function FilterPill({
 
 export default function EmployeesPage() {
   const { t } = useLanguage();
-  const allValue = "ALL";
+  const [userRole, setUserRole] = useState<"admin" | "manager" | "employee" | null>(null);
   const [employees, setEmployees] = useState<Employee[]>([]);
+  const [departments, setDepartments] = useState<Department[]>([]);
+  
+  // Filter states
   const [department, setDepartment] = useState(allValue);
-  const [role, setRole] = useState(allValue);
+  const [roleFilter, setRoleFilter] = useState(allValue);
+  
+  // Form state
   const [form, setForm] = useState({
     name: "",
-    role: "",
-    department: "",
     email: "",
-    location: "",
-    status: "Active" as Employee["status"],
+    username: "",
+    position: "",
+    department: "", // This will store the NAME string, not ID
+    role: "",
+    password: "",
   });
+  
+  // Confirmation state
+  const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  const canManageEmployees = userRole === "admin" || userRole === "manager";
+  const canCreateManager = userRole === "admin";
+  const canAssignAdmins = userRole === "admin";
+
+  useEffect(() => {
+    const user = getStoredUser();
+    setUserRole(user?.role ?? null);
+  }, []);
 
   useEffect(() => {
     let active = true;
-    getEmployees().then((data) => {
+    Promise.all([getEmployees(), getDepartments()]).then(([empsData, deptsData]) => {
       if (active) {
-        setEmployees(data);
+        setEmployees(empsData);
+        setDepartments(deptsData);
       }
-    });
+    }).catch(console.error);
     return () => {
       active = false;
     };
   }, []);
 
-  const departments = useMemo(() => {
-    const values = new Set(employees.map((item) => item.department));
-    return [allValue, ...Array.from(values)];
-  }, [employees]);
-
   const roles = useMemo(() => {
     const values = new Set(employees.map((item) => item.role));
     return [allValue, ...Array.from(values)];
   }, [employees]);
+  
+  // We can use departments list for filter pills too, or just based on existing employees
+  const availableDepts = useMemo(() => {
+     // Use department names from API if possible, fallback to employee data
+     const names = new Set(departments.map(d => d.name));
+     if (names.size === 0) {
+         employees.forEach(e => names.add(e.department));
+     }
+     return [allValue, ...Array.from(names)];
+  }, [departments, employees]);
+
 
   const filtered = useMemo(() => {
     return employees.filter((item) => {
       const departmentOk = department === allValue || item.department === department;
-      const roleOk = role === allValue || item.role === role;
+      const roleOk = roleFilter === allValue || item.role === roleFilter;
       return departmentOk && roleOk;
     });
-  }, [employees, department, role]);
-
-  const statusLabels: Record<Employee["status"], string> = {
-    Active: t("employees.status.active"),
-    Remote: t("employees.status.remote"),
-    "On Leave": t("employees.status.leave"),
-  };
+  }, [employees, department, roleFilter]);
 
   const handleAdd = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const trimmed = {
       name: form.name.trim(),
-      role: form.role.trim(),
-      department: form.department.trim(),
       email: form.email.trim(),
-      location: form.location.trim(),
+      username: form.username.trim(),
+      position: form.position.trim(),
+      department: form.department.trim(), // Name string
+      role: form.role.trim(),
+      password: form.password.trim(),
     };
 
-    if (!trimmed.name || !trimmed.role || !trimmed.department) {
-      return;
+    if (!trimmed.name || !trimmed.department || !trimmed.email) {
+      return; 
     }
 
-    const fallbackNext: Employee = {
-      id: `EMP-${Date.now()}`,
-      name: trimmed.name,
-      role: trimmed.role,
-      department: trimmed.department,
-      email: trimmed.email || "-",
-      location: trimmed.location || "-",
-      status: form.status,
-    };
-
-    createEmployee({
-      name: trimmed.name,
-      email: trimmed.email || `${Date.now()}@example.com`,
-      position: trimmed.role,
-      department: trimmed.department,
-      role: trimmed.role,
-    })
+    createEmployee(trimmed)
       .then((created) => {
         setEmployees((prev) => [created, ...prev]);
+        setForm({
+          name: "",
+          email: "",
+          username: "",
+          position: "",
+          department: "",
+          role: "",
+          password: "",
+        });
+        setSuccessMessage(`Employee created successfully!\n${trimmed.password ? 'Password: ' + trimmed.password : 'Default password: password123'}\nLogin: ${trimmed.username || trimmed.email}`);
       })
-      .catch(() => {
-        setEmployees((prev) => [fallbackNext, ...prev]);
+      .catch((err) => {
+        const message = err instanceof Error && err.message ? err.message : t("employees.create.error");
+        alert(message);
+        console.warn(err);
       });
-
-    setForm({
-      name: "",
-      role: "",
-      department: "",
-      email: "",
-      location: "",
-      status: "Active",
-    });
   };
 
-  const handleDelete = (id: string) => {
-    const found = employees.find((item) => item.id === id);
-    const apiId = found?.apiId;
+  const handleDelete = (id: number) => {
+      setDeletingId(id);
+  };
 
-    if (apiId) {
-      deleteEmployee(apiId)
+  const handleRoleAssign = (id: number, newRole: "admin" | "manager" | "employee") => {
+    updateEmployeeRole(id, newRole)
+      .then((updated) => {
+        setEmployees((prev) => prev.map((item) => (item.id === id ? updated : item)));
+      })
+      .catch((err) => {
+        const message = err instanceof Error && err.message ? err.message : t("employees.update.error");
+        alert(message);
+        console.warn(err);
+      });
+  };
+
+  const confirmDelete = () => {
+      if (deletingId === null) return;
+      deleteEmployee(deletingId)
         .then(() => {
-          setEmployees((prev) => prev.filter((item) => item.id !== id));
+          setEmployees((prev) => prev.filter((item) => item.id !== deletingId));
+          setDeletingId(null);
         })
-        .catch(() => {
-          setEmployees((prev) => prev.filter((item) => item.id !== id));
+        .catch((err) => {
+          alert(t("employees.delete.error"));
+          console.warn(err);
+          setDeletingId(null);
         });
-      return;
-    }
-
-    setEmployees((prev) => prev.filter((item) => item.id !== id));
   };
 
   return (
@@ -172,28 +191,26 @@ export default function EmployeesPage() {
         </div>
       </header>
 
+      {canManageEmployees && (
       <section className="animated-border rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-              {t("employees.new.title")}
-            </p>
-            <p className="mt-1 text-sm text-slate-600">
-              {t("employees.new.subtitle")}
-            </p>
-          </div>
-          <button
-            type="submit"
-            form="employee-form"
-            className="animated-border group inline-flex items-center justify-center rounded-2xl border border-slate-200 bg-white px-6 py-3 text-sm font-semibold text-slate-800 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
-          >
-            {t("employees.add")}
-          </button>
-        </div>
+         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div>
+               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+                  {t("employees.new.title")}
+               </p>
+            </div>
+            <button
+               type="submit"
+               form="employee-form"
+               className="animated-border group inline-flex items-center justify-center rounded-2xl border border-slate-200 bg-white px-6 py-3 text-sm font-semibold text-slate-800 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+            >
+               {t("employees.add")}
+            </button>
+         </div>
         <form
           id="employee-form"
           onSubmit={handleAdd}
-          className="mt-6 grid gap-4 md:grid-cols-3"
+          className="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-3"
         >
           <div className="space-y-2">
             <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
@@ -209,30 +226,6 @@ export default function EmployeesPage() {
           </div>
           <div className="space-y-2">
             <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-              {t("employees.form.role")}
-            </label>
-            <input
-              value={form.role}
-              onChange={(event) => setForm({ ...form, role: event.target.value })}
-              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700 focus:border-slate-400 focus:outline-none"
-              placeholder={t("employees.form.role.placeholder")}
-              required
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-              {t("employees.form.department")}
-            </label>
-            <input
-              value={form.department}
-              onChange={(event) => setForm({ ...form, department: event.target.value })}
-              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700 focus:border-slate-400 focus:outline-none"
-              placeholder={t("employees.form.department.placeholder")}
-              required
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
               {t("employees.form.email")}
             </label>
             <input
@@ -241,37 +234,78 @@ export default function EmployeesPage() {
               onChange={(event) => setForm({ ...form, email: event.target.value })}
               className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700 focus:border-slate-400 focus:outline-none"
               placeholder={t("employees.form.email.placeholder")}
+              required
             />
           </div>
           <div className="space-y-2">
             <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-              {t("employees.form.location")}
+              {t("employees.form.login")}
             </label>
             <input
-              value={form.location}
-              onChange={(event) => setForm({ ...form, location: event.target.value })}
+              value={form.username}
+              onChange={(event) => setForm({ ...form, username: event.target.value })}
               className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700 focus:border-slate-400 focus:outline-none"
-              placeholder={t("employees.form.location.placeholder")}
+              placeholder={t("employees.form.login.placeholder")}
             />
           </div>
           <div className="space-y-2">
             <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-              {t("employees.form.status")}
+              {t("common.password")}
+            </label>
+            <input
+              value={form.password}
+              onChange={(event) => setForm({ ...form, password: event.target.value })}
+              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700 focus:border-slate-400 focus:outline-none"
+              placeholder={t("common.password.placeholder") || "Password (optional)"}
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+              {t("employees.form.department")}
             </label>
             <select
-              value={form.status}
-              onChange={(event) =>
-                setForm({ ...form, status: event.target.value as Employee["status"] })
-              }
+              value={form.department}
+              onChange={(event) => setForm({ ...form, department: event.target.value })}
               className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700 focus:border-slate-400 focus:outline-none"
+              required
             >
-              <option value="Active">{statusLabels.Active}</option>
-              <option value="Remote">{statusLabels.Remote}</option>
-              <option value="On Leave">{statusLabels["On Leave"]}</option>
+                <option value="">{t("common.select.department")}</option>
+                {departments.map((d) => (
+                    <option key={d.id} value={d.name}>{d.name}</option> 
+                ))}
+            </select>
+          </div>
+          <div className="space-y-2">
+            <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+              {t("employees.form.position")}
+            </label>
+            <input
+              value={form.position}
+              onChange={(event) => setForm({ ...form, position: event.target.value })}
+              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700 focus:border-slate-400 focus:outline-none"
+              placeholder={t("employees.form.position.placeholder")}
+              required
+            />
+          </div>
+           <div className="space-y-2">
+            <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+              {t("employees.form.role")}
+            </label>
+            <select
+              value={form.role}
+              onChange={(event) => setForm({ ...form, role: event.target.value })}
+              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700 focus:border-slate-400 focus:outline-none"
+              required
+            >
+                <option value="">{t("common.select.role")}</option>
+                <option value="employee">{t("roles.employee")}</option>
+                {canCreateManager && <option value="manager">{t("roles.manager")}</option>}
+                {canAssignAdmins && <option value="admin">{t("roles.admin")}</option>}
             </select>
           </div>
         </form>
       </section>
+      )}
 
       <section className="animated-border grid gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm md:grid-cols-2">
         <div className="space-y-3">
@@ -279,7 +313,7 @@ export default function EmployeesPage() {
             {t("employees.form.department")}
           </p>
           <div className="flex flex-wrap gap-2">
-            {departments.map((value) => (
+            {availableDepts.map((value) => (
               <FilterPill
                 key={value}
                 label={value === allValue ? t("common.all") : value}
@@ -298,146 +332,95 @@ export default function EmployeesPage() {
               <FilterPill
                 key={value}
                 label={value === allValue ? t("common.all") : value}
-                active={role === value}
-                onClick={() => setRole(value)}
+                active={roleFilter === value}
+                onClick={() => setRoleFilter(value)}
               />
             ))}
           </div>
         </div>
-        <div className="md:col-span-2 flex flex-wrap gap-2 text-xs text-slate-500">
-          <button
-            type="button"
-            onClick={() => {
-              setDepartment(allValue);
-              setRole(allValue);
-            }}
-            className="animated-border rounded-full border border-slate-200 bg-slate-50 px-3 py-1 font-medium text-slate-600 hover:bg-slate-100"
-          >
-            {t("common.reset")}
-          </button>
-        </div>
       </section>
 
-      {filtered.length === 0 ? (
-        <section className="animated-border rounded-2xl border border-dashed border-slate-200 bg-white p-8 text-center text-sm text-slate-500">
-          {t("employees.empty")}
-        </section>
-      ) : (
-        <section className="animated-border hidden overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm md:block">
-          <table className="w-full text-left text-sm">
-            <thead className="bg-slate-50 text-xs uppercase tracking-[0.2em] text-slate-400">
-              <tr>
-                <th className="px-6 py-3">{t("employees.table.employee")}</th>
-                <th className="px-6 py-3">{t("employees.table.role")}</th>
-                <th className="px-6 py-3">{t("employees.table.department")}</th>
-                <th className="px-6 py-3">{t("employees.table.location")}</th>
-                <th className="px-6 py-3">{t("employees.table.status")}</th>
-                <th className="px-6 py-3 text-right">{t("employees.table.actions")}</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-200">
-              {filtered.map((item) => (
-                <tr key={item.id} className="hover:bg-slate-50">
-                  <td className="px-6 py-4">
-                    <div className="font-medium text-slate-900">{item.name}</div>
-                    <div className="text-xs text-slate-500">{item.email}</div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <button
-                      type="button"
-                      onClick={() => setRole(item.role)}
-                      className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs text-slate-600 hover:bg-slate-100"
-                    >
-                      {item.role}
-                    </button>
-                  </td>
-                  <td className="px-6 py-4">
-                    <button
-                      type="button"
-                      onClick={() => setDepartment(item.department)}
-                      className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs text-slate-600 hover:bg-slate-100"
-                    >
-                      {item.department}
-                    </button>
-                  </td>
-                  <td className="px-6 py-4 text-slate-600">{item.location}</td>
-                  <td className="px-6 py-4">
-                    <span
-                      className={`inline-flex items-center rounded-full border px-3 py-1 text-xs ${
-                        statusStyles[item.status]
-                      }`}
-                    >
-                      {statusLabels[item.status]}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-right">
-                    <button
-                      type="button"
-                      onClick={() => handleDelete(item.id)}
-                      className="animated-border rounded-full border border-slate-200 bg-white px-3 py-1 text-xs text-slate-500 transition hover:border-slate-300 hover:text-slate-700"
-                    >
-                      {t("common.delete")}
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </section>
-      )}
-
-      {filtered.length > 0 && (
-        <section className="grid gap-4 md:hidden">
-          {filtered.map((item) => (
-            <article
-              key={item.id}
-              className="animated-border rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
-            >
-              <div className="flex items-start justify-between gap-3">
+      <section className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {filtered.map((item) => (
+          <div
+            key={item.id}
+            className="animated-border group relative flex flex-col justify-between rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+          >
+            <div>
+              <div className="flex items-start justify-between">
                 <div>
-                  <h2 className="text-base font-semibold text-slate-900">
-                    {item.name}
-                  </h2>
-                  <p className="text-xs text-slate-500">{item.email}</p>
+                  <h3 className="font-semibold text-slate-900">{item.name}</h3>
+                  <p className="text-sm text-slate-500">{item.position}</p>
                 </div>
-                <span
-                  className={`inline-flex items-center rounded-full border px-3 py-1 text-xs ${
-                    statusStyles[item.status]
-                  }`}
-                >
-                  {statusLabels[item.status]}
-                </span>
-              </div>
-              <div className="mt-4 flex flex-wrap gap-2 text-xs">
-                <button
-                  type="button"
-                  onClick={() => setRole(item.role)}
-                  className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-slate-600"
-                >
-                  {item.role}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setDepartment(item.department)}
-                  className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-slate-600"
-                >
-                  {item.department}
-                </button>
-                <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-slate-600">
-                  {item.location}
-                </span>
-                <button
+                {canManageEmployees && (
+                 <button
                   type="button"
                   onClick={() => handleDelete(item.id)}
-                  className="animated-border rounded-full border border-slate-200 bg-white px-3 py-1 text-slate-500"
+                  className="text-slate-400 hover:text-rose-500"
+                  title={t("common.delete")}
                 >
-                  {t("common.delete")}
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                  </svg>
                 </button>
+                )}
               </div>
-            </article>
-          ))}
-        </section>
-      )}
+              <div className="mt-4 grid gap-2">
+                <div className="flex items-center gap-2 text-sm text-slate-600">
+                  <span className="font-medium text-slate-400 uppercase tracking-wider text-[10px]">{t("common.dept")}</span>
+                  {item.department}
+                </div>
+                <div className="flex items-center gap-2 text-sm text-slate-600">
+                  <span className="font-medium text-slate-400 uppercase tracking-wider text-[10px]">{t("employees.form.email")}</span>
+                  {item.email}
+                </div>
+                <div className="flex items-center gap-2 text-sm text-slate-600">
+                  <span className="font-medium text-slate-400 uppercase tracking-wider text-[10px]">{t("employees.form.login")}</span>
+                  {item.username || item.email}
+                </div>
+                 <div className="flex items-center gap-2 text-sm text-slate-600">
+                  <span className="font-medium text-slate-400 uppercase tracking-wider text-[10px]">{t("employees.table.role")}</span>
+                  {canAssignAdmins ? (
+                    <select
+                      value={item.role}
+                      onChange={(event) => handleRoleAssign(item.id, event.target.value as "admin" | "manager" | "employee")}
+                      className="rounded border border-slate-200 bg-white px-2 py-1 text-xs text-slate-700 focus:border-slate-400 focus:outline-none"
+                    >
+                      <option value="employee">{t("roles.employee")}</option>
+                      <option value="manager">{t("roles.manager")}</option>
+                      <option value="admin">{t("roles.admin")}</option>
+                    </select>
+                  ) : (
+                    item.role
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+        {filtered.length === 0 && (
+          <div className="col-span-full py-10 text-center text-sm text-slate-500">
+            {t("employees.empty")}
+          </div>
+        )}
+      </section>
+
+      <ConfirmDialog
+        isOpen={!!successMessage}
+        message={successMessage || ""}
+        onConfirm={() => setSuccessMessage(null)}
+        onCancel={() => setSuccessMessage(null)}
+        showCancel={false}
+        confirmLabel="OK"
+      />
+
+      <ConfirmDialog
+        isOpen={deletingId !== null}
+        message={t("employees.delete.confirm")}
+        onConfirm={confirmDelete}
+        onCancel={() => setDeletingId(null)}
+        isDestructive
+      />
     </div>
   );
 }

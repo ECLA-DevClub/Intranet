@@ -2,8 +2,9 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { getAccessToken, getStoredUser, logoutLocal } from "@/lib/auth";
+import { getAccessToken, logoutLocal } from "@/lib/auth";
 import { fetchMe } from "@/lib/api";
+import AppHeader from "@/components/AppHeader";
 
 const LOGIN_PATH = "/login";
 
@@ -13,7 +14,8 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
 
   const [ready, setReady] = useState(false);
 
-  const isLoginRoute = useMemo(() => pathname === LOGIN_PATH, [pathname]);
+  // Simple check: if on login page, we might want to hide header
+  const isLoginRoute = pathname === LOGIN_PATH;
 
   useEffect(() => {
     let active = true;
@@ -21,6 +23,7 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
     async function boot() {
       const access = getAccessToken();
 
+      // Case 1: No token
       if (!access) {
         if (!isLoginRoute) {
           router.replace(LOGIN_PATH);
@@ -29,26 +32,22 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
         return;
       }
 
+      // Case 2: Token exists, but on login page -> redirect to Home
       if (isLoginRoute) {
         router.replace("/");
+        // We don't set ready here effectively because we are redirecting away
+        // But to be safe in case of lag:
         if (active) setReady(true);
         return;
       }
 
-      const existingUser = getStoredUser();
-      if (existingUser) {
-        if (active) setReady(true);
-        return;
-      }
-
+      // Case 3: Token exists, on protected page. Validate token/profile.
       try {
         await fetchMe();
+        if (active) setReady(true);
       } catch {
-        // Токен мог протухнуть; fetchMe внутри попробует refresh.
-        // Если всё равно упало — выкидываем локальную сессию.
         logoutLocal();
         router.replace(LOGIN_PATH);
-      } finally {
         if (active) setReady(true);
       }
     }
@@ -57,18 +56,29 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
     return () => {
       active = false;
     };
-  }, [isLoginRoute, router]);
+  }, [isLoginRoute, router, pathname]);
 
+  // Loading state
   if (!ready) {
     return (
-      <div className="mx-auto w-full max-w-6xl px-6 py-8">
-        <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
-          <div className="h-4 w-40 rounded bg-slate-100" />
-          <div className="mt-4 h-4 w-64 rounded bg-slate-100" />
-        </div>
+      <div className="min-h-screen bg-slate-100 p-8 flex justify-center items-start">
+         <div className="w-full max-w-4xl space-y-4 animate-pulse">
+            <div className="h-16 w-full rounded-2xl bg-white/50" />
+            <div className="h-64 w-full rounded-2xl bg-white/50" />
+         </div>
       </div>
     );
   }
 
-  return <>{children}</>;
+  // Render application layout
+  return (
+    <div className="min-h-screen bg-slate-100 pb-10">
+      {/* Hide Header on Login Page */}
+      {!isLoginRoute && <AppHeader />}
+      
+      <main className={`mx-auto w-full max-w-6xl px-6 ${!isLoginRoute ? 'py-8' : 'flex items-center justify-center min-h-screen'}`}>
+         {children}
+      </main>
+    </div>
+  );
 }

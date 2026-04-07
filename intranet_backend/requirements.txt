@@ -1,6 +1,17 @@
 Django>=6,<6.1
 wagtail==7.3rc1
+djangorestframework>=3.14.0
 djangorestframework-simplejwt>=5.3,<6
+django-cors-headers>=4.3.1
+django-filter>=24.1
+django-modelcluster>=6.2
+django-taggit>=5.0.1
 django-storages>=1.14,<2
 boto3>=1.35,<2
+<<<<<<< HEAD
 drf-spectacular>=0.28,<1
+=======
+psycopg2-binary>=2.9.9
+dj-database-url>=2.1.0
+python-dotenv>=1.0.1
+>>>>>>> 86b35fa71a295cbd9e98e4b1ab0e2b19db253e74

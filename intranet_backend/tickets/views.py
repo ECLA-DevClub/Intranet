@@ -2,8 +2,11 @@ from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework import viewsets, filters, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+from django.db.models import Q
 from documents.permissions import IsAssignedToDepartment
-from .permissions import IsTicketAssignee
+from accounts.permissions import IsManagerOrAdmin
+from .permissions import IsTicketAssignee, IsTicketParticipant, IsTicketOwner
 from .models import Ticket
 from .serializers import TicketSerializer, StatusChangeSerializer, AssignTicketSerializer
 from audit.models import AuditLog
@@ -39,7 +42,25 @@ class TicketViewSet(viewsets.ModelViewSet):
     """CRUD for tickets with department-based access and custom status/assign actions."""
 
     serializer_class = TicketSerializer
-    permission_classes = [IsAssignedToDepartment]
+    
+    def get_permissions(self):
+        # Any authenticated user may list/retrieve/create tickets available in queryset.
+        if self.action in ("list", "retrieve", "create"):
+            return [IsAuthenticated()]
+
+        if self.action in ("update", "partial_update", "destroy"):
+            return [IsTicketOwner()]
+            
+        # Assign is restricted to manager/admin and department scope.
+        if self.action == "assign":
+            return [IsManagerOrAdmin(), IsAssignedToDepartment()]
+            
+        # Status changes are allowed for assignee, manager, and admin.
+        if self.action == "change_status":
+            return [IsTicketAssignee()]
+
+        return [IsTicketParticipant()]
+
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['title', 'description']
     ordering_fields = ['created_at', 'title', 'status']
@@ -51,10 +72,16 @@ class TicketViewSet(viewsets.ModelViewSet):
         if user.is_superuser or user.role == 'admin':
             return base_qs
 
-        if hasattr(user, 'department') and user.department:
-            return base_qs.filter(department=user.department)
+        # Allow access to tickets:
+        # 1. In the user's department
+        # 2. Created by the user
+        # 3. Assigned to the user
+        filters = Q(created_by=user) | Q(assignee=user)
 
-        return base_qs.none()
+        if hasattr(user, 'department') and user.department:
+            filters |= Q(department=user.department)
+
+        return base_qs.filter(filters).distinct()
 
     # ── Audit helpers ─────────────────────────────────────
 

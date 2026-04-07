@@ -2,7 +2,7 @@ from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework import viewsets, filters
 from rest_framework.permissions import IsAuthenticated
 
-from accounts.permissions import IsManagerOrAdmin
+from accounts.permissions import IsAdmin
 from departments.models import Department
 from departments.serializers import DepartmentSerializer
 
@@ -46,4 +46,4 @@ class DepartmentViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         if self.action in ("list", "retrieve"):
             return [IsAuthenticated()]
-        return [IsManagerOrAdmin()]
+        return [IsAdmin()]

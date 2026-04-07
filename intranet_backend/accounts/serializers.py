@@ -12,7 +12,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
         token = super().get_token(user)
-        token["role"] = user.role
+        token["role"] = User.Role.ADMIN if user.is_superuser else user.role
         token["username"] = user.username
         return token
 
@@ -41,6 +41,11 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 class UserSerializer(serializers.ModelSerializer):
     """Read / update serializer for user profiles."""
+
+    role = serializers.SerializerMethodField(read_only=True)
+
+    def get_role(self, obj):
+        return User.Role.ADMIN if obj.is_superuser else obj.role
 
     class Meta:
         model = User

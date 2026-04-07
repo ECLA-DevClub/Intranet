@@ -1,15 +1,13 @@
 "use client";
 
 import { useEffect, useMemo, useState, type FormEvent } from "react";
-import type { DocumentItem } from "@/lib/mockData";
-import { deleteDocument, getDocuments } from "@/lib/api";
+import type { DocumentItem, Department } from "@/lib/api";
+import { createDocument, deleteDocument, getDocuments, getDepartments } from "@/lib/api";
+import { getStoredUser } from "@/lib/auth";
 import { useLanguage } from "@/components/i18n";
+import ConfirmDialog from "@/components/ConfirmDialog";
 
-const accessStyles: Record<DocumentItem["access"], string> = {
-  Public: "bg-emerald-50 text-emerald-700 border-emerald-200",
-  Internal: "bg-slate-50 text-slate-600 border-slate-200",
-  Restricted: "bg-rose-50 text-rose-700 border-rose-200",
-};
+const allValue = "ALL";
 
 function FilterPill({
   label,
@@ -25,7 +23,7 @@ function FilterPill({
       type="button"
       onClick={onClick}
       aria-pressed={active}
-      className={`animated-border rounded-full border px-3 py-1 text-xs font-medium transition ${
+      className={`animated-border rounded-full border px-4 py-2 text-sm font-medium transition ${
         active
           ? "border-slate-400 bg-slate-200 text-slate-900"
           : "border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100"
@@ -38,383 +36,251 @@ function FilterPill({
 
 export default function DocumentsPage() {
   const { t } = useLanguage();
-  const allValue = "ALL";
+  const [userRole, setUserRole] = useState<"admin" | "manager" | "employee" | null>(null);
   const [documents, setDocuments] = useState<DocumentItem[]>([]);
-  const [category, setCategory] = useState(allValue);
+  const [departments, setDepartments] = useState<Department[]>([]);
+  
+  // Filter state (stores department ID as string or "ALL")
   const [department, setDepartment] = useState(allValue);
-  const [form, setForm] = useState({
-    title: "",
-    category: "",
-    department: "",
-    owner: "",
-    access: "Internal" as DocumentItem["access"],
-  });
+  
+  // File upload state
+  const [title, setTitle] = useState("");
+  const [selectedDept, setSelectedDept] = useState(""); // Stores ID
+  const [file, setFile] = useState<File | null>(null);
+  
+  // Confirmation state
+  const [deletingId, setDeletingId] = useState<number | null>(null);
+
+  const canManageDocuments = userRole === "admin" || userRole === "manager";
 
   useEffect(() => {
+    const user = getStoredUser();
+    setUserRole(user?.role ?? null);
+
     let active = true;
-    getDocuments().then((data) => {
+    Promise.all([getDocuments(), getDepartments()]).then(([docsData, deptsData]) => {
       if (active) {
-        setDocuments(data);
+        setDocuments(docsData);
+        setDepartments(deptsData);
       }
-    });
+    }).catch(console.warn);
     return () => {
       active = false;
     };
   }, []);
 
-  const categories = useMemo(() => {
-    const values = new Set(documents.map((item) => item.category));
-    return [allValue, ...Array.from(values)];
-  }, [documents]);
-
-  const departments = useMemo(() => {
-    const values = new Set(documents.map((item) => item.department));
-    return [allValue, ...Array.from(values)];
-  }, [documents]);
-
   const filtered = useMemo(() => {
     return documents.filter((item) => {
-      const categoryOk = category === allValue || item.category === category;
-      const departmentOk = department === allValue || item.department === department;
-      return categoryOk && departmentOk;
+      if (department === allValue) return true;
+      
+      // item.department is number (ID)
+      return item.department.toString() === department;
     });
-  }, [documents, category, department]);
+  }, [documents, department]);
 
-  const accessLabels: Record<DocumentItem["access"], string> = {
-    Public: t("documents.access.public"),
-    Internal: t("documents.access.internal"),
-    Restricted: t("documents.access.restricted"),
+  const handleCreate = (e: FormEvent) => {
+      e.preventDefault();
+      if (!file || !title || !selectedDept) return;
+
+      const formData = new FormData();
+      formData.append("title", title);
+      formData.append("department", selectedDept); // Sends ID
+      formData.append("file", file);
+
+      createDocument(formData).then((newDoc) => {
+          setDocuments(prev => [newDoc, ...prev]);
+          setTitle("");
+          setFile(null);
+          setSelectedDept("");
+          // Reset file input visually if needed, but managing state is key
+          const fileInput = document.getElementById('file-upload') as HTMLInputElement;
+          if (fileInput) fileInput.value = '';
+      }).catch(err => {
+          alert(t("documents.upload.error"));
+          console.warn(err);
+      });
   };
 
-  const handleAdd = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const trimmed = {
-      title: form.title.trim(),
-      category: form.category.trim(),
-      department: form.department.trim(),
-      owner: form.owner.trim(),
-    };
-
-    if (!trimmed.title) {
-      return;
-    }
-
-    const next: DocumentItem = {
-      id: `DOC-${Date.now()}`,
-      title: trimmed.title,
-      category: trimmed.category || "General",
-      department: trimmed.department || "-",
-      owner: trimmed.owner || "-",
-      updated: new Date().toLocaleDateString("ru-RU", {
-        day: "2-digit",
-        month: "long",
-      }),
-      access: form.access,
-    };
-
-    setDocuments((prev) => [next, ...prev]);
-    setForm({
-      title: "",
-      category: "",
-      department: "",
-      owner: "",
-      access: "Internal",
-    });
+  const handleDelete = (id: number) => {
+      setDeletingId(id);
   };
 
-  const handleDelete = (id: string) => {
-    const found = documents.find((item) => item.id === id);
-    const apiId = found?.apiId;
-
-    if (apiId) {
-      deleteDocument(apiId)
+  const confirmDelete = () => {
+      if (deletingId === null) return;
+      deleteDocument(deletingId)
         .then(() => {
-          setDocuments((prev) => prev.filter((item) => item.id !== id));
+            setDocuments(prev => prev.filter(d => d.id !== deletingId));
+            setDeletingId(null);
         })
-        .catch(() => {
-          setDocuments((prev) => prev.filter((item) => item.id !== id));
+        .catch(err => {
+            alert(t("documents.delete.error"));
+          console.warn(err);
+            setDeletingId(null);
         });
-      return;
-    }
+  };
 
-    setDocuments((prev) => prev.filter((item) => item.id !== id));
+  // Helper to get department name from ID
+  const getDeptName = (id: number | Department) => {
+      if (typeof id === 'object') return id.name;
+      const d = departments.find(dep => dep.id === id);
+      return d ? d.name : t("departments.unknown");
   };
 
   return (
     <div className="space-y-8">
-      <header className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-        <div>
+      <header>
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
             {t("documents.label")}
           </p>
           <h1 className="mt-2 text-2xl font-semibold text-slate-900">
             {t("documents.title")}
           </h1>
-          <p className="mt-1 text-sm text-slate-600">
+           <p className="mt-1 text-sm text-slate-600">
             {t("documents.subtitle")}
           </p>
-        </div>
-        <div className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-600">
-          {t("common.showing")} <span className="font-semibold text-slate-800">{filtered.length}</span>
-        </div>
       </header>
 
+      {/* Upload Form */}
+      {canManageDocuments && (
       <section className="animated-border rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-              {t("documents.new.title")}
-            </p>
-            <p className="mt-1 text-sm text-slate-600">
-              {t("documents.new.subtitle")}
-            </p>
-          </div>
-          <button
-            type="submit"
-            form="document-form"
-            className="animated-border group inline-flex items-center justify-center rounded-2xl border border-slate-200 bg-white px-6 py-3 text-sm font-semibold text-slate-800 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
-          >
-            {t("documents.add")}
-          </button>
-        </div>
-        <form
-          id="document-form"
-          onSubmit={handleAdd}
-          className="mt-6 grid gap-4 md:grid-cols-3"
-        >
-          <div className="space-y-2 md:col-span-3">
-            <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-              {t("documents.form.title")}
-            </label>
-            <input
-              value={form.title}
-              onChange={(event) => setForm({ ...form, title: event.target.value })}
-              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700 focus:border-slate-400 focus:outline-none"
-              placeholder={t("documents.form.title.placeholder")}
-              required
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-              {t("documents.form.category")}
-            </label>
-            <input
-              value={form.category}
-              onChange={(event) => setForm({ ...form, category: event.target.value })}
-              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700 focus:border-slate-400 focus:outline-none"
-              placeholder={t("documents.form.category.placeholder")}
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-              {t("documents.form.department")}
-            </label>
-            <input
-              value={form.department}
-              onChange={(event) => setForm({ ...form, department: event.target.value })}
-              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700 focus:border-slate-400 focus:outline-none"
-              placeholder={t("documents.form.department.placeholder")}
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-              {t("documents.form.owner")}
-            </label>
-            <input
-              value={form.owner}
-              onChange={(event) => setForm({ ...form, owner: event.target.value })}
-              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700 focus:border-slate-400 focus:outline-none"
-              placeholder={t("documents.form.owner.placeholder")}
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-              {t("documents.form.access")}
-            </label>
-            <select
-              value={form.access}
-              onChange={(event) =>
-                setForm({ ...form, access: event.target.value as DocumentItem["access"] })
-              }
-              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700 focus:border-slate-400 focus:outline-none"
-            >
-              <option value="Public">{accessLabels.Public}</option>
-              <option value="Internal">{accessLabels.Internal}</option>
-              <option value="Restricted">{accessLabels.Restricted}</option>
-            </select>
-          </div>
-        </form>
+         <h2 className="text-sm font-semibold text-slate-900 mb-4">{t("documents.new.title")}</h2>
+         <form onSubmit={handleCreate} className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+             <div className="space-y-2">
+                <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">{t("documents.form.title")}</label>
+                <input 
+                   value={title}
+                   onChange={e => setTitle(e.target.value)}
+                   className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm focus:border-slate-400 focus:outline-none"
+                   placeholder={t("documents.form.title.placeholder")}
+                   required
+                />
+             </div>
+             <div className="space-y-2">
+                <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">{t("documents.form.department")}</label>
+                <select 
+                   value={selectedDept}
+                   onChange={e => setSelectedDept(e.target.value)}
+                   className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm focus:border-slate-400 focus:outline-none"
+                   required
+                >
+                    <option value="">{t("common.select.department")}</option>
+                    {departments.map(d => (
+                        <option key={d.id} value={d.id}>{d.name}</option> 
+                    ))}
+                </select>
+             </div>
+             <div className="space-y-2">
+                <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">{t("documents.form.file")}</label>
+                <input 
+                   id="file-upload"
+                   type="file"
+                   onChange={e => setFile(e.target.files?.[0] || null)}
+                   className="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200"
+                   required
+                />
+             </div>
+             <div className="col-span-1 md:col-span-2 lg:col-span-3 flex justify-end">
+                 <button
+                   type="submit"
+                   className="animated-border rounded-xl bg-slate-900 px-6 py-2 text-sm font-medium text-white shadow-sm hover:bg-slate-800"
+                 >
+                   {t("documents.upload")}
+                 </button>
+             </div>
+         </form>
       </section>
-
-      <section className="animated-border grid gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm md:grid-cols-2">
-        <div className="space-y-3">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-            {t("documents.form.category")}
-          </p>
-          <div className="flex flex-wrap gap-2">
-            {categories.map((value) => (
-              <FilterPill
-                key={value}
-                label={value === allValue ? t("common.all") : value}
-                active={category === value}
-                onClick={() => setCategory(value)}
-              />
-            ))}
-          </div>
-        </div>
-        <div className="space-y-3">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-            {t("documents.form.department")}
-          </p>
-          <div className="flex flex-wrap gap-2">
-            {departments.map((value) => (
-              <FilterPill
-                key={value}
-                label={value === allValue ? t("common.all") : value}
-                active={department === value}
-                onClick={() => setDepartment(value)}
-              />
-            ))}
-          </div>
-        </div>
-        <div className="md:col-span-2 flex flex-wrap gap-2 text-xs text-slate-500">
-          <button
-            type="button"
-            onClick={() => {
-              setCategory(allValue);
-              setDepartment(allValue);
-            }}
-            className="animated-border rounded-full border border-slate-200 bg-slate-50 px-3 py-1 font-medium text-slate-600 hover:bg-slate-100"
-          >
-            {t("common.reset")}
-          </button>
-        </div>
-      </section>
-
-      {filtered.length === 0 ? (
-        <section className="animated-border rounded-2xl border border-dashed border-slate-200 bg-white p-8 text-center text-sm text-slate-500">
-          {t("documents.empty")}
-        </section>
-      ) : (
-        <section className="animated-border hidden overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm md:block">
-          <table className="w-full text-left text-sm">
-            <thead className="bg-slate-50 text-xs uppercase tracking-[0.2em] text-slate-400">
-              <tr>
-                <th className="px-6 py-3">{t("documents.table.document")}</th>
-                <th className="px-6 py-3">{t("documents.table.category")}</th>
-                <th className="px-6 py-3">{t("documents.table.department")}</th>
-                <th className="px-6 py-3">{t("documents.table.owner")}</th>
-                <th className="px-6 py-3">{t("documents.table.access")}</th>
-                <th className="px-6 py-3 text-right">{t("documents.table.actions")}</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-200">
-              {filtered.map((item) => (
-                <tr key={item.id} className="hover:bg-slate-50">
-                  <td className="px-6 py-4">
-                    <div className="font-medium text-slate-900">{item.title}</div>
-                    <div className="text-xs text-slate-500">
-                      {item.id} • {item.updated}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <button
-                      type="button"
-                      onClick={() => setCategory(item.category)}
-                      className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs text-slate-600 hover:bg-slate-100"
-                    >
-                      {item.category}
-                    </button>
-                  </td>
-                  <td className="px-6 py-4">
-                    <button
-                      type="button"
-                      onClick={() => setDepartment(item.department)}
-                      className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs text-slate-600 hover:bg-slate-100"
-                    >
-                      {item.department}
-                    </button>
-                  </td>
-                  <td className="px-6 py-4 text-slate-600">{item.owner}</td>
-                  <td className="px-6 py-4">
-                    <span
-                      className={`inline-flex items-center rounded-full border px-3 py-1 text-xs ${
-                        accessStyles[item.access]
-                      }`}
-                    >
-                      {accessLabels[item.access]}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-right">
-                    <button
-                      type="button"
-                      onClick={() => handleDelete(item.id)}
-                      className="animated-border rounded-full border border-slate-200 bg-white px-3 py-1 text-xs text-slate-500 transition hover:border-slate-300 hover:text-slate-700"
-                    >
-                      {t("common.delete")}
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </section>
       )}
 
-      {filtered.length > 0 && (
-        <section className="grid gap-4 md:hidden">
-          {filtered.map((item) => (
-            <article
-              key={item.id}
-              className="animated-border rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
-            >
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <h2 className="text-base font-semibold text-slate-900">
-                    {item.title}
-                  </h2>
-                  <p className="text-xs text-slate-500">
-                    {item.id} • {item.updated}
-                  </p>
-                </div>
-                <span
-                  className={`inline-flex items-center rounded-full border px-3 py-1 text-xs ${
-                    accessStyles[item.access]
-                  }`}
-                >
-                  {accessLabels[item.access]}
-                </span>
-              </div>
-              <div className="mt-4 flex flex-wrap gap-2 text-xs">
-                <button
-                  type="button"
-                  onClick={() => setCategory(item.category)}
-                  className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-slate-600"
-                >
-                  {item.category}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setDepartment(item.department)}
-                  className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-slate-600"
-                >
-                  {item.department}
-                </button>
-                <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-slate-600">
-                  {item.owner}
-                </span>
-                <button
-                  type="button"
-                  onClick={() => handleDelete(item.id)}
-                  className="animated-border rounded-full border border-slate-200 bg-white px-3 py-1 text-slate-500"
-                >
-                  {t("common.delete")}
-                </button>
-              </div>
-            </article>
+      {/* Filters */}
+      <section className="flex flex-wrap gap-2">
+          <FilterPill
+            label={t("departments.all")}
+            active={department === allValue}
+            onClick={() => setDepartment(allValue)}
+          />
+          {departments.map(d => (
+              <FilterPill
+                 key={d.id}
+                 label={d.name}
+                 active={department === d.id.toString()}
+                 onClick={() => setDepartment(d.id.toString())}
+              />
           ))}
-        </section>
-      )}
+      </section>
+
+      {/* List */}
+      <section className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {filtered.map((item) => (
+          <div
+            key={item.id}
+            className="animated-border group relative flex flex-col justify-between rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+          >
+            <div>
+              <div className="flex items-start justify-between">
+                <div>
+                   {/* File Icon */}
+                   <div className="h-10 w-10 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+                      </svg>
+                   </div>
+                   <h3 className="mt-4 font-semibold text-slate-900 break-words">{item.title}</h3>
+                </div>
+                {canManageDocuments && (
+                <button
+                  onClick={() => handleDelete(item.id)}
+                  className="text-slate-400 hover:text-rose-500"
+                  title={t("common.delete")}
+                >
+                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                   </svg>
+                </button>
+                )}
+              </div>
+              
+              <div className="mt-4 flex flex-col gap-1 text-xs text-slate-500">
+                  <div className="flex justify-between">
+                      <span>{t("common.owner")}</span>
+                      <span className="font-medium text-slate-700">{item.author_name || `User #${item.author}`}</span>
+                  </div>
+                   <div className="flex justify-between">
+                      <span>{t("common.dept")}</span>
+                      <span className="font-medium text-slate-700">{getDeptName(item.department)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                     <span>{t("common.version")}</span>
+                     <span>{item.current_version}</span>
+                  </div>
+              </div>
+            </div>
+            
+            <div className="mt-4 pt-3 border-t border-slate-100">
+               <a 
+                 href={item.file} // Assumes full URL from API or handled by buildUrl
+                 target="_blank"
+                 rel="noopener noreferrer"
+                 className="block w-full text-center rounded-lg bg-slate-50 py-2 text-xs font-medium text-slate-700 hover:bg-slate-100"
+               >
+                 {t("common.download")}
+               </a>
+            </div>
+          </div>
+        ))}
+        {filtered.length === 0 && (
+          <div className="col-span-full py-10 text-center text-sm text-slate-500">
+            {t("documents.empty")}
+          </div>
+        )}
+      </section>
+
+      <ConfirmDialog
+        isOpen={deletingId !== null}
+        message={t("documents.delete.confirm")}
+        onConfirm={confirmDelete}
+        onCancel={() => setDeletingId(null)}
+        isDestructive
+      />
     </div>
   );
 }

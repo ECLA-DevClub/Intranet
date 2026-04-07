@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { LanguageProvider } from "@/components/i18n";
-import AppHeader from "@/components/AppHeader";
 import AuthGate from "@/components/AuthGate";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
@@ -17,7 +16,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Intranet",
-  description: "Внутренний портал компании",
+  description: "Internal Company Portal",
 };
 
 export default function RootLayout({
@@ -28,14 +27,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased text-slate-900`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased text-slate-900 bg-slate-100`}
       >
         <LanguageProvider>
           <AuthGate>
-            <div className="min-h-screen bg-slate-100">
-              <AppHeader />
-              <main className="mx-auto w-full max-w-6xl px-6 py-8">{children}</main>
-            </div>
+            {children}
           </AuthGate>
         </LanguageProvider>
       </body>

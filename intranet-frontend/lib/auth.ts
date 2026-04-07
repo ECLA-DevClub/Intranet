@@ -19,31 +19,48 @@ function hasWindow(): boolean {
   return typeof window !== "undefined";
 }
 
-export function getAccessToken(): string | null {
+function getAuthStorage(): Storage | null {
   if (!hasWindow()) return null;
-  return window.localStorage.getItem(ACCESS_KEY);
+
+  try {
+    // Clear legacy persistent auth so reopening the site requires a fresh login.
+    window.localStorage.removeItem(ACCESS_KEY);
+    window.localStorage.removeItem(REFRESH_KEY);
+    window.localStorage.removeItem(USER_KEY);
+    return window.sessionStorage;
+  } catch {
+    return null;
+  }
+}
+
+export function getAccessToken(): string | null {
+  const storage = getAuthStorage();
+  return storage?.getItem(ACCESS_KEY) ?? null;
 }
 
 export function getRefreshToken(): string | null {
-  if (!hasWindow()) return null;
-  return window.localStorage.getItem(REFRESH_KEY);
+  const storage = getAuthStorage();
+  return storage?.getItem(REFRESH_KEY) ?? null;
 }
 
 export function setTokens(tokens: AuthTokens): void {
-  if (!hasWindow()) return;
-  window.localStorage.setItem(ACCESS_KEY, tokens.access);
-  window.localStorage.setItem(REFRESH_KEY, tokens.refresh);
+  const storage = getAuthStorage();
+  if (!storage) return;
+  storage.setItem(ACCESS_KEY, tokens.access);
+  storage.setItem(REFRESH_KEY, tokens.refresh);
 }
 
 export function clearTokens(): void {
-  if (!hasWindow()) return;
-  window.localStorage.removeItem(ACCESS_KEY);
-  window.localStorage.removeItem(REFRESH_KEY);
+  const storage = getAuthStorage();
+  if (!storage) return;
+  storage.removeItem(ACCESS_KEY);
+  storage.removeItem(REFRESH_KEY);
 }
 
 export function getStoredUser(): CurrentUser | null {
-  if (!hasWindow()) return null;
-  const raw = window.localStorage.getItem(USER_KEY);
+  const storage = getAuthStorage();
+  if (!storage) return null;
+  const raw = storage.getItem(USER_KEY);
   if (!raw) return null;
   try {
     return JSON.parse(raw) as CurrentUser;
@@ -53,13 +70,15 @@ export function getStoredUser(): CurrentUser | null {
 }
 
 export function setStoredUser(user: CurrentUser): void {
-  if (!hasWindow()) return;
-  window.localStorage.setItem(USER_KEY, JSON.stringify(user));
+  const storage = getAuthStorage();
+  if (!storage) return;
+  storage.setItem(USER_KEY, JSON.stringify(user));
 }
 
 export function clearStoredUser(): void {
-  if (!hasWindow()) return;
-  window.localStorage.removeItem(USER_KEY);
+  const storage = getAuthStorage();
+  if (!storage) return;
+  storage.removeItem(USER_KEY);
 }
 
 export function logoutLocal(): void {
