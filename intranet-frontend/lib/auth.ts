@@ -23,11 +23,7 @@ function getAuthStorage(): Storage | null {
   if (!hasWindow()) return null;
 
   try {
-    // Clear legacy persistent auth so reopening the site requires a fresh login.
-    window.localStorage.removeItem(ACCESS_KEY);
-    window.localStorage.removeItem(REFRESH_KEY);
-    window.localStorage.removeItem(USER_KEY);
-    return window.sessionStorage;
+    return window.localStorage;
   } catch {
     return null;
   }
