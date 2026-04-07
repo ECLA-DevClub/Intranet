@@ -41,5 +41,6 @@ USER wagtail
 # Collect static files.
 RUN python manage.py collectstatic --noinput --clear
 
-# Start the application server.
-CMD gunicorn intranet_backend.wsgi:application --bind 0.0.0.0:$PORT
+# Start the application server via entrypoint
+RUN sed -i 's/\r$//' entrypoint.sh && chmod +x entrypoint.sh
+CMD ["./entrypoint.sh"]
