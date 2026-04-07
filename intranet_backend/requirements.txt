@@ -3,3 +3,4 @@ wagtail==7.3rc1
 djangorestframework-simplejwt>=5.3,<6
 django-storages>=1.14,<2
 boto3>=1.35,<2
+drf-spectacular>=0.28,<1

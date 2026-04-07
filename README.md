@@ -74,3 +74,20 @@ The first release (MVP) will include:
 ---
 
 ## 📂 Project Structure
+
+---
+
+## 🛠 Local Development
+
+```bash
+cd intranet_backend
+python manage.py runserver --settings=intranet_backend.settings.dev
+```
+
+| Resource | URL |
+|---|---|
+| Backend | `http://localhost:8000` |
+| Swagger UI | `http://localhost:8000/api/docs/` |
+| ReDoc | `http://localhost:8000/api/redoc/` |
+| Django Admin | `http://localhost:8000/django-admin/` |
+| Wagtail Admin | `http://localhost:8000/admin/` |
