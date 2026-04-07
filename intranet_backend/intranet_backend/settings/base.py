@@ -123,6 +123,7 @@ CSRF_TRUSTED_ORIGINS = [
     "http://127.0.0.1:3000",
     "http://127.0.0.1:3001",
     "https://intranet-pearl.vercel.app",
+    "https://intranet-production-d177.up.railway.app",
 ]
 
 # Database
