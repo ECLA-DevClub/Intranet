@@ -81,6 +81,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -129,7 +130,7 @@ CSRF_TRUSTED_ORIGINS = [
 
 DATABASES = {
     "default": dj_database_url.config(
-        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
+        default="postgresql://postgres.mdjdodwzleuqnwdlpvuz:intranetdevclubengineering2026@aws-1-ap-southeast-2.pooler.supabase.com:5432/postgres",
         conn_max_age=600,
         conn_health_checks=True,
     )
