@@ -1,3 +1,4 @@
+from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework import viewsets, filters, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -10,11 +11,35 @@ from .permissions import IsAssignedToDepartment, IsDocumentParticipant
 from audit.models import AuditLog
 
 
+@extend_schema_view(
+    list=extend_schema(
+        tags=["Documents"],
+        description="**Access:** Department-scoped (Admin sees all).\n\nList documents.",
+    ),
+    create=extend_schema(
+        tags=["Documents"],
+        description="**Access:** Department-scoped (Admin sees all).\n\nUpload a new document (FormData: title, department, file).",
+    ),
+    retrieve=extend_schema(
+        tags=["Documents"],
+        description="**Access:** Department-scoped (Admin sees all).\n\nRetrieve document details.",
+    ),
+    update=extend_schema(
+        tags=["Documents"],
+        description="**Access:** Department-scoped (Admin sees all).\n\nFully update a document (title only, not file).",
+    ),
+    partial_update=extend_schema(
+        tags=["Documents"],
+        description="**Access:** Department-scoped (Admin sees all).\n\nPartially update a document (title only).",
+    ),
+    destroy=extend_schema(
+        tags=["Documents"],
+        description="**Access:** Department-scoped (Admin sees all).\n\nDelete a document with all its versions.",
+    ),
+)
 class DocumentViewSet(viewsets.ModelViewSet):
-    """
-    CRUD for documents with department-based access.
-    Extra actions: upload_version, versions.
-    """
+    """CRUD for documents with department-based access and versioning actions."""
+
     serializer_class = DocumentSerializer
     
     def get_permissions(self):
@@ -80,6 +105,12 @@ class DocumentViewSet(viewsets.ModelViewSet):
 
     # ── Versioning actions ────────────────────────────────
 
+    @extend_schema(
+        tags=["Documents"],
+        description="**Access:** Department-scoped (Admin sees all).\n\nUpload a new version of an existing document. Creates version current_version + 1.",
+        request=UploadVersionSerializer,
+        responses={201: DocumentVersionSerializer},
+    )
     @action(detail=True, methods=['post'], url_path='upload-version')
     def upload_version(self, request, pk=None):
         """Upload a new version of an existing document."""
@@ -111,6 +142,11 @@ class DocumentViewSet(viewsets.ModelViewSet):
             status=status.HTTP_201_CREATED,
         )
 
+    @extend_schema(
+        tags=["Documents"],
+        description="**Access:** Department-scoped (Admin sees all).\n\nList all versions of a document.",
+        responses={200: DocumentVersionSerializer(many=True)},
+    )
     @action(detail=True, methods=['get'], url_path='versions')
     def versions(self, request, pk=None):
         """List all versions of a document."""

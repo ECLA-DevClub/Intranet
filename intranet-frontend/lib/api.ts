@@ -11,7 +11,7 @@ const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL ??
   (process.env.NODE_ENV === "development"
     ? "http://127.0.0.1:8000"
-    : "https://intranet-backend-sand.vercel.app");
+    : "https://intranet-production-d177.up.railway.app");
 
 const normalizedBaseUrl = API_BASE_URL.replace(/\/+$/, "");
 

@@ -1,3 +1,4 @@
+from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework import viewsets, filters, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -11,11 +12,35 @@ from .serializers import TicketSerializer, StatusChangeSerializer, AssignTicketS
 from audit.models import AuditLog
 
 
+@extend_schema_view(
+    list=extend_schema(
+        tags=["Tickets"],
+        description="**Access:** Department-scoped (Admin sees all).\n\nList tickets. Supports `?search=` and `?ordering=created_at`.",
+    ),
+    create=extend_schema(
+        tags=["Tickets"],
+        description="**Access:** Department-scoped (Admin sees all).\n\nCreate a new ticket.",
+    ),
+    retrieve=extend_schema(
+        tags=["Tickets"],
+        description="**Access:** Department-scoped (Admin sees all).\n\nRetrieve ticket details.",
+    ),
+    update=extend_schema(
+        tags=["Tickets"],
+        description="**Access:** Department-scoped (Admin sees all).\n\nFully update a ticket (except status and assignee).",
+    ),
+    partial_update=extend_schema(
+        tags=["Tickets"],
+        description="**Access:** Department-scoped (Admin sees all).\n\nPartially update a ticket (except status and assignee).",
+    ),
+    destroy=extend_schema(
+        tags=["Tickets"],
+        description="**Access:** Department-scoped (Admin sees all).\n\nDelete a ticket.",
+    ),
+)
 class TicketViewSet(viewsets.ModelViewSet):
-    """
-    CRUD for tickets with department-based access.
-    Extra actions: change_status, assign.
-    """
+    """CRUD for tickets with department-based access and custom status/assign actions."""
+
     serializer_class = TicketSerializer
     
     def get_permissions(self):
@@ -85,10 +110,16 @@ class TicketViewSet(viewsets.ModelViewSet):
 
     # ── Custom actions ────────────────────────────────────
 
+    @extend_schema(
+        tags=["Tickets"],
+        description="**Access:** Assignee or Admin only.\n\nChange ticket status. Transitions: open → in_progress → closed.",
+        request=StatusChangeSerializer,
+        responses={200: TicketSerializer},
+    )
     @action(detail=True, methods=['post'], url_path='change-status',
             permission_classes=[IsTicketAssignee])
     def change_status(self, request, pk=None):
-        """Change ticket status with transition validation. Only assignee or admin."""
+        """Change ticket status with transition validation."""
         ticket = self.get_object()
         serializer = StatusChangeSerializer(data=request.data, context={'ticket': ticket})
         serializer.is_valid(raise_exception=True)
@@ -105,6 +136,12 @@ class TicketViewSet(viewsets.ModelViewSet):
 
         return Response(TicketSerializer(ticket).data, status=status.HTTP_200_OK)
 
+    @extend_schema(
+        tags=["Tickets"],
+        description="**Access:** Department-scoped (Admin sees all).\n\nAssign ticket to an employee by user ID.",
+        request=AssignTicketSerializer,
+        responses={200: TicketSerializer},
+    )
     @action(detail=True, methods=['post'], url_path='assign')
     def assign(self, request, pk=None):
         """Assign ticket to an employee."""

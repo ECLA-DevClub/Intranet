@@ -75,11 +75,13 @@ INSTALLED_APPS = [
     "audit",
     "corsheaders",
     "rest_framework",
+    "drf_spectacular",
     "wagtail.api.v2",
 ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -121,6 +123,7 @@ CSRF_TRUSTED_ORIGINS = [
     "http://127.0.0.1:3000",
     "http://127.0.0.1:3001",
     "https://intranet-pearl.vercel.app",
+    "https://intranet-production-d177.up.railway.app",
 ]
 
 # Database
@@ -128,11 +131,13 @@ CSRF_TRUSTED_ORIGINS = [
 
 DATABASES = {
     "default": dj_database_url.config(
-        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
-        conn_max_age=600,
-        conn_health_checks=True,
+        default="postgresql://postgres.mdjdodwzleuqnwdlpvuz:intranetdevclubengineering2026@aws-1-ap-southeast-2.pooler.supabase.com:6543/postgres",
+        conn_max_age=0,  # Обязательно 0 для Serverless (Vercel)
+        conn_health_checks=False,
     )
 }
+# Защита от багов Server-side Cursors с пулером (PgBouncer)
+DATABASES["default"]["DISABLE_SERVER_SIDE_CURSORS"] = True
 
 
 # Password validation
@@ -238,6 +243,17 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": (
         "rest_framework.permissions.IsAuthenticated",
     ),
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+}
+
+# --- drf-spectacular (OpenAPI / Swagger) ---
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Intranet Platform API",
+    "DESCRIPTION": "REST API for the Intranet Platform — authentication, departments, employees, tickets, documents, and audit logs.",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+    "COMPONENT_SPLIT_REQUEST": True,
+    "SCHEMA_PATH_PREFIX": "/api/",
 }
 
 # --- Simple JWT ---

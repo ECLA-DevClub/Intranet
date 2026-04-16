@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from drf_spectacular.utils import extend_schema
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 
@@ -8,11 +9,12 @@ from accounts.serializers import RegisterSerializer, UserSerializer
 User = get_user_model()
 
 
+@extend_schema(
+    tags=["Auth"],
+    description="**Access:** Admin only.\n\nCreate a new user with a specific role.",
+)
 class RegisterView(generics.CreateAPIView):
-    """
-    POST /api/auth/register/
-    Admin-only: create a new user with a specific role.
-    """
+    """POST /api/auth/register/ — Admin-only user creation."""
 
     serializer_class = RegisterSerializer
     permission_classes = [IsAdmin]
@@ -27,11 +29,12 @@ class RegisterView(generics.CreateAPIView):
         )
 
 
+@extend_schema(
+    tags=["Auth"],
+    description="**Access:** Any authenticated user (own profile only).\n\nRetrieve or update the currently authenticated user's profile.",
+)
 class ProfileView(generics.RetrieveUpdateAPIView):
-    """
-    GET / PUT /api/auth/profile/
-    Returns or updates the currently authenticated user's profile.
-    """
+    """GET / PUT /api/auth/profile/ — own profile."""
 
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -40,11 +43,12 @@ class ProfileView(generics.RetrieveUpdateAPIView):
         return self.request.user
 
 
+@extend_schema(
+    tags=["Auth"],
+    description="**Access:** Admin only.\n\nList all registered users.",
+)
 class UserListView(generics.ListAPIView):
-    """
-    GET /api/auth/users/
-    Admin-only: list all users.
-    """
+    """GET /api/auth/users/ — Admin-only user list."""
 
     serializer_class = UserSerializer
     permission_classes = [IsAdmin]
