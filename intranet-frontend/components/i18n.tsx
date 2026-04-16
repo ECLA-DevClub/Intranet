@@ -172,8 +172,14 @@ const dictionary: Record<Language, Record<string, string>> = {
     "common.created": "Created:",
     "common.version": "Ver:",
     "common.owner": "Owner:",
+    "common.user": "User",
     "common.unassigned": "Unassigned",
     "common.download": "Download",
+    "nav.settings": "Settings",
+    "employees.create.success": "Employee created successfully!",
+    "employees.create.password": "Password: ",
+    "employees.create.default_password": "Default password: password123",
+    "employees.create.login": "Login: ",
 
     // Departments
     "departments.label": "Management",
@@ -337,8 +343,14 @@ const dictionary: Record<Language, Record<string, string>> = {
     "common.created": "Создан:",
     "common.version": "Вер:",
     "common.owner": "Владелец:",
+    "common.user": "Пользователь",
     "common.unassigned": "Не назначен",
     "common.download": "Скачать",
+    "nav.settings": "Настройки",
+    "employees.create.success": "Сотрудник успешно создан!",
+    "employees.create.password": "Пароль: ",
+    "employees.create.default_password": "Пароль по умолчанию: password123",
+    "employees.create.login": "Логин: ",
 
     // Departments
     "departments.label": "Управление",

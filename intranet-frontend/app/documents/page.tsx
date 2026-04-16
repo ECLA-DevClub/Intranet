@@ -242,7 +242,7 @@ export default function DocumentsPage() {
               <div className="mt-4 flex flex-col gap-1 text-xs text-slate-500">
                   <div className="flex justify-between">
                       <span>{t("common.owner")}</span>
-                      <span className="font-medium text-slate-700">{item.author_name || `User #${item.author}`}</span>
+                      <span className="font-medium text-slate-700">{item.author_name || `${t("common.user") || "User"} #${item.author}`}</span>
                   </div>
                    <div className="flex justify-between">
                       <span>{t("common.dept")}</span>

@@ -50,7 +50,7 @@ export default function AppHeader() {
             EC
           </span>
           <span className="hidden sm:inline">{t("nav.intranet")}</span>
-          <span className="sm:hidden">Intranet</span>
+          <span className="sm:hidden">{t("nav.intranet")}</span>
         </Link>
         
         {/* Desktop Navigation */}
@@ -136,7 +136,7 @@ export default function AppHeader() {
               {t("nav.documents")}
             </Link>
             <div className="flex items-center justify-between border-t border-slate-100 pt-4 mt-2">
-              <span className="text-xs font-medium text-slate-500 uppercase">Settings</span>
+              <span className="text-xs font-medium text-slate-500 uppercase">{t("nav.settings")}</span>
               <div className="flex items-center gap-3">
                 <ThemeToggle />
                 <LanguageToggle />

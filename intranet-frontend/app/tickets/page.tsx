@@ -155,7 +155,7 @@ export default function TicketsPage() {
   const getDeptName = (id: number | Department) => {
       if (typeof id === 'object') return id.name;
       const d = departments.find(dep => dep.id === id);
-      return d ? d.name : `Dept #${id}`;
+      return d ? d.name : t("departments.unknown");
   };
 
   return (

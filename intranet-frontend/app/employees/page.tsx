@@ -133,7 +133,7 @@ export default function EmployeesPage() {
           role: "",
           password: "",
         });
-        setSuccessMessage(`Employee created successfully!\n${trimmed.password ? 'Password: ' + trimmed.password : 'Default password: password123'}\nLogin: ${trimmed.username || trimmed.email}`);
+        setSuccessMessage(`${t("employees.create.success")}\n${trimmed.password ? t("employees.create.password") + trimmed.password : t("employees.create.default_password")}\n${t("employees.create.login")}${trimmed.username || trimmed.email}`);
       })
       .catch((err) => {
         const message = err instanceof Error && err.message ? err.message : t("employees.create.error");
@@ -256,7 +256,7 @@ export default function EmployeesPage() {
               value={form.password}
               onChange={(event) => setForm({ ...form, password: event.target.value })}
               className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700 focus:border-slate-400 focus:outline-none"
-              placeholder={t("common.password.placeholder") || "Password (optional)"}
+              placeholder={t("common.password.placeholder")}
             />
           </div>
           <div className="space-y-2">
