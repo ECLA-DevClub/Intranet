@@ -118,16 +118,20 @@ html.dark .bg-white {
   background-color: #1e293b !important;
 }
 
+html.dark .bg-white\/95,
 html.dark .bg-white\/90,
-html.dark .bg-white\/80 {
-  background-color: rgba(15, 23, 42, 0.9) !important;
+html.dark .bg-white\/80,
+html.dark .bg-white\/70 {
+  background-color: rgba(15, 23, 42, 0.8) !important;
 }
 
-html.dark .bg-slate-100 {
+html.dark .bg-slate-100,
+html.dark .bg-slate-100\/50 {
   background-color: #0f172a !important;
 }
 
-html.dark .bg-slate-50 {
+html.dark .bg-slate-50,
+html.dark .bg-slate-50\/50 {
   background-color: #1e293b !important;
 }
 
