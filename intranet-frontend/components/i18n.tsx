@@ -9,7 +9,7 @@ import {
   type ReactNode,
 } from "react";
 
-type Language = "en" | "ru";
+export type Language = "en" | "ru";
 
 type I18nContextValue = {
   lang: Language;

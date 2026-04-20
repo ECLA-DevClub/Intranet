@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { useLanguage } from "@/components/i18n";
+import { useLanguage, type Language } from "@/components/i18n";
 
 export default function LanguageToggle() {
   const { lang, setLang } = useLanguage();
@@ -18,7 +18,7 @@ export default function LanguageToggle() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const languages = [
+  const languages: { code: Language; label: string }[] = [
     { code: "en", label: "English (EN)" },
     { code: "ru", label: "Русский (RU)" }
   ];
