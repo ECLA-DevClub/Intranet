@@ -1241,3 +1241,5 @@ INFO 2026-04-17 21:24:30,831 log 21952 14044 "GET /api/employees/ HTTP/1.1" 200 
 INFO 2026-04-17 21:24:32,239 log 21952 26564 "GET /api/departments/ HTTP/1.1" 200 401
 INFO 2026-04-17 21:24:35,152 log 21952 26564 "GET /api/departments/ HTTP/1.1" 200 401
 INFO 2026-04-17 21:24:35,265 log 21952 14044 "GET /api/departments/ HTTP/1.1" 200 401
+INFO 2026-04-21 16:18:56,996 autoreload 15220 1440 Watching for file changes with StatReloader
+INFO 2026-04-21 16:19:15,187 autoreload 21704 27164 Watching for file changes with StatReloader
